@@ -6,7 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="71953d37-8715-42c5-b1f9-b5bb73b7f1dd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/container/repository_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/repository_container.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/inners/models/entities/account.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/models/entities/account.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/inners/use_cases/account_use_case.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/use_cases/account_use_case.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/configs/two_database_config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/configs/two_database_config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/gateways/one_gateway.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/gateways/one_gateway.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/account_graphql.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +47,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "DefaultGoTemplateProperty": "Go File",
+    "Go Build.go build main.go.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
@@ -45,13 +55,13 @@
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "git-widget-placeholder": "main",
     "go.import.settings.migrated": "true",
-    "last_opened_file_path": "C:/data/apps/social-media-backend-1",
+    "last_opened_file_path": "C:/data/apps/social-media-backend-1/.env",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "onboarding.tips.debug.path": "C:/data/apps/social-media-backend-1/main.go",
     "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable"
+    "settings.editor.selected.configurable": "com.apollographql.ijplugin.settings.lsp.LspSettingsConfigurable"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -63,12 +73,39 @@
       <recent name="C:\data\apps\social-media-backend-1\src\outers\deliveries\graphqls" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\data\apps\social-media-backend-1\src\outers\deliveries" />
-      <recent name="C:\data\apps\social-media-backend-1\src" />
-      <recent name="C:\data\apps\social-media-backend-1\src\outers" />
+      <recent name="C:\data\apps\social-media-backend-1\internal" />
+      <recent name="C:\data\apps\social-media-backend-1\internal\outers\deliveries\graphqls" />
       <recent name="C:\data\apps\social-media-backend-1" />
-      <recent name="C:\data\apps\social-media-backend-1\src\cmd\web" />
+      <recent name="C:\data\apps\social-media-backend-1\internal\outers\deliveries\graphqls\graph" />
+      <recent name="C:\data\apps\social-media-backend-1\src\outers\deliveries" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="social-media-backend-1" />
+      <working_directory value="$PROJECT_DIR$" />
+      <EXTENSION ID="net.ashald.envfile">
+        <option name="IS_ENABLED" value="true" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+          <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH=".env" />
+        </ENTRIES>
+      </EXTENSION>
+      <kind value="FILE" />
+      <package value="social-media-backend-1" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/internal/main.go" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Build.go build main.go" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>

@@ -1,0 +1,34 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+type Account {
+  id: ID!
+  name: String!
+  email: String!
+  password: String!
+  totalPostLike: Float!
+  totalChatMessage: Float!
+  posts: [Post]!
+}
+
+extend type Post @key(fields: "id") {
+  id: ID! @external
+  author: Account!
+}
+
+type Query {
+    accounts: [Account!]!
+    account(id: ID!): Account
+}
+
+input AccountInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+type Mutation {
+    createAccount(input: AccountInput!): Account!
+    updateAccount(id: ID!, input: AccountInput!): Account!
+    deleteAccount(id: ID!): Account!
+}

@@ -7,6 +7,6 @@ type Account struct {
 	Name             string    `json:"name"`
 	Email            string    `json:"email"`
 	Password         string
-	TotalPostLike    int `json:"total_post_like"`
-	TotalChatMessage int `json:"total_chat_message"`
+	TotalPostLike    float64 `json:"total_post_like"`
+	TotalChatMessage float64 `json:"total_chat_message"`
 }

@@ -16,6 +16,16 @@ extend type Post @key(fields: "id") {
   author: Account!
 }
 
+extend type ChatRoom @key(fields: "id") {
+  id: ID! @external
+  participants: [Account!]!
+}
+
+extend type ChatMessage @key(fields: "id") {
+  id: ID! @external
+  sender: Account!
+}
+
 type Query {
     accounts: [Account!]!
     account(id: ID!): Account

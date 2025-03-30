@@ -29,6 +29,18 @@ func (r *AccountRepository) GetAccountById(id uuid.UUID) (*entities.Account, err
 	return nil, nil
 }
 
+func (r *AccountRepository) GetAccountsByIds(ids []uuid.UUID) ([]*entities.Account, []error) {
+	var accounts []*entities.Account
+	for _, id := range ids {
+		for _, account := range r.TwoDatabaseConfig.AccountData {
+			if account.ID == id {
+				accounts = append(accounts, account)
+			}
+		}
+	}
+	return accounts, nil
+}
+
 func (r *AccountRepository) CreateAccount(account *entities.Account) error {
 	r.TwoDatabaseConfig.AccountData = append(r.TwoDatabaseConfig.AccountData, account)
 	return nil

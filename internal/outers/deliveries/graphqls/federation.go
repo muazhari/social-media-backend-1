@@ -153,6 +153,44 @@ func (ec *executionContext) resolveEntity(
 	}()
 
 	switch typeName {
+	case "ChatMessage":
+		resolverName, err := entityResolverNameForChatMessage(ctx, rep)
+		if err != nil {
+			return nil, fmt.Errorf(`finding resolver for Entity "ChatMessage": %w`, err)
+		}
+		switch resolverName {
+
+		case "findChatMessageByID":
+			id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+			if err != nil {
+				return nil, fmt.Errorf(`unmarshalling param 0 for findChatMessageByID(): %w`, err)
+			}
+			entity, err := ec.resolvers.Entity().FindChatMessageByID(ctx, id0)
+			if err != nil {
+				return nil, fmt.Errorf(`resolving Entity "ChatMessage": %w`, err)
+			}
+
+			return entity, nil
+		}
+	case "ChatRoom":
+		resolverName, err := entityResolverNameForChatRoom(ctx, rep)
+		if err != nil {
+			return nil, fmt.Errorf(`finding resolver for Entity "ChatRoom": %w`, err)
+		}
+		switch resolverName {
+
+		case "findChatRoomByID":
+			id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+			if err != nil {
+				return nil, fmt.Errorf(`unmarshalling param 0 for findChatRoomByID(): %w`, err)
+			}
+			entity, err := ec.resolvers.Entity().FindChatRoomByID(ctx, id0)
+			if err != nil {
+				return nil, fmt.Errorf(`resolving Entity "ChatRoom": %w`, err)
+			}
+
+			return entity, nil
+		}
 	case "Post":
 		resolverName, err := entityResolverNameForPost(ctx, rep)
 		if err != nil {
@@ -196,6 +234,76 @@ func (ec *executionContext) resolveManyEntities(
 	default:
 		return errors.New("unknown type: " + typeName)
 	}
+}
+
+func entityResolverNameForChatMessage(ctx context.Context, rep EntityRepresentation) (string, error) {
+	// we collect errors because a later entity resolver may work fine
+	// when an entity has multiple keys
+	entityResolverErrs := []error{}
+	for {
+		var (
+			m   EntityRepresentation
+			val any
+			ok  bool
+		)
+		_ = val
+		// if all of the KeyFields values for this resolver are null,
+		// we shouldn't use use it
+		allNull := true
+		m = rep
+		val, ok = m["id"]
+		if !ok {
+			entityResolverErrs = append(entityResolverErrs,
+				fmt.Errorf("%w due to missing Key Field \"id\" for ChatMessage", ErrTypeNotFound))
+			break
+		}
+		if allNull {
+			allNull = val == nil
+		}
+		if allNull {
+			entityResolverErrs = append(entityResolverErrs,
+				fmt.Errorf("%w due to all null value KeyFields for ChatMessage", ErrTypeNotFound))
+			break
+		}
+		return "findChatMessageByID", nil
+	}
+	return "", fmt.Errorf("%w for ChatMessage due to %v", ErrTypeNotFound,
+		errors.Join(entityResolverErrs...).Error())
+}
+
+func entityResolverNameForChatRoom(ctx context.Context, rep EntityRepresentation) (string, error) {
+	// we collect errors because a later entity resolver may work fine
+	// when an entity has multiple keys
+	entityResolverErrs := []error{}
+	for {
+		var (
+			m   EntityRepresentation
+			val any
+			ok  bool
+		)
+		_ = val
+		// if all of the KeyFields values for this resolver are null,
+		// we shouldn't use use it
+		allNull := true
+		m = rep
+		val, ok = m["id"]
+		if !ok {
+			entityResolverErrs = append(entityResolverErrs,
+				fmt.Errorf("%w due to missing Key Field \"id\" for ChatRoom", ErrTypeNotFound))
+			break
+		}
+		if allNull {
+			allNull = val == nil
+		}
+		if allNull {
+			entityResolverErrs = append(entityResolverErrs,
+				fmt.Errorf("%w due to all null value KeyFields for ChatRoom", ErrTypeNotFound))
+			break
+		}
+		return "findChatRoomByID", nil
+	}
+	return "", fmt.Errorf("%w for ChatRoom due to %v", ErrTypeNotFound,
+		errors.Join(entityResolverErrs...).Error())
 }
 
 func entityResolverNameForPost(ctx context.Context, rep EntityRepresentation) (string, error) {

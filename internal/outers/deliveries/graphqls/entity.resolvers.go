@@ -9,6 +9,24 @@ import (
 	"social-media-backend-1/internal/outers/deliveries/graphqls/model"
 )
 
+// FindChatMessageByID is the resolver for the findChatMessageByID field.
+func (r *entityResolver) FindChatMessageByID(ctx context.Context, id string) (*model.ChatMessage, error) {
+	result := &model.ChatMessage{
+		ID: id,
+	}
+
+	return result, nil
+}
+
+// FindChatRoomByID is the resolver for the findChatRoomByID field.
+func (r *entityResolver) FindChatRoomByID(ctx context.Context, id string) (*model.ChatRoom, error) {
+	result := &model.ChatRoom{
+		ID: id,
+	}
+
+	return result, nil
+}
+
 // FindPostByID is the resolver for the findPostByID field.
 func (r *entityResolver) FindPostByID(ctx context.Context, id string) (*model.Post, error) {
 	result := &model.Post{

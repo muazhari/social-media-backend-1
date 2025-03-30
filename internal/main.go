@@ -27,9 +27,7 @@ func main() {
 
 	rootContainer := container.NewRootContainer()
 
-	resolver := &graphqls.Resolver{
-		RootContainer: rootContainer,
-	}
+	resolver := graphqls.NewResolver(rootContainer)
 	srv := handler.New(graphqls.NewExecutableSchema(graphqls.Config{Resolvers: resolver}))
 
 	srv.AddTransport(transport.Options{})

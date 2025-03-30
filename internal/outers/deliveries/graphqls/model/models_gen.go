@@ -18,6 +18,20 @@ type AccountInput struct {
 	Password string `json:"password"`
 }
 
+type ChatMessage struct {
+	ID     string   `json:"id"`
+	Sender *Account `json:"sender"`
+}
+
+func (ChatMessage) IsEntity() {}
+
+type ChatRoom struct {
+	ID           string     `json:"id"`
+	Participants []*Account `json:"participants"`
+}
+
+func (ChatRoom) IsEntity() {}
+
 type Mutation struct {
 }
 

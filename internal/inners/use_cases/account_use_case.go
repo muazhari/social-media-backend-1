@@ -32,12 +32,12 @@ func (uc *AccountUseCase) GetAccountById(id uuid.UUID) (*entities.Account, error
 	return account, nil
 }
 
-func (uc *AccountUseCase) CreateAccount(account *entities.Account) error {
-	err := uc.AccountRepository.CreateAccount(account)
+func (uc *AccountUseCase) CreateAccount(account *entities.Account) (*entities.Account, error) {
+	account, err := uc.AccountRepository.CreateAccount(account)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return account, nil
 }
 
 func (uc *AccountUseCase) UpdateAccountById(id uuid.UUID, account *entities.Account) (*entities.Account, error) {

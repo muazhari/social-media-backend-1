@@ -24,16 +24,16 @@ func (r *mutationResolver) CreateAccount(ctx context.Context, input model.Accoun
 		TotalChatMessage: 0,
 	}
 
-	err := r.RootContainer.UseCaseContainer.AccountUseCase.CreateAccount(account)
+	createdAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.CreateAccount(account)
 	if err != nil {
 		return nil, err
 	}
 
 	result := &model.Account{
-		ID:               account.ID.String(),
-		Name:             account.Name,
-		Email:            account.Email,
-		Password:         account.Password,
+		ID:               createdAccount.ID.String(),
+		Name:             createdAccount.Name,
+		Email:            createdAccount.Email,
+		Password:         createdAccount.Password,
 		TotalPostLike:    0,
 		TotalChatMessage: 0,
 		Posts:            nil,

@@ -54,7 +54,6 @@ type ComplexityRoot struct {
 		ID               func(childComplexity int) int
 		Name             func(childComplexity int) int
 		Password         func(childComplexity int) int
-		Posts            func(childComplexity int) int
 		TotalChatMessage func(childComplexity int) int
 		TotalPostLike    func(childComplexity int) int
 	}
@@ -159,13 +158,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Account.Password(childComplexity), true
-
-	case "Account.posts":
-		if e.complexity.Account.Posts == nil {
-			break
-		}
-
-		return e.complexity.Account.Posts(childComplexity), true
 
 	case "Account.totalChatMessage":
 		if e.complexity.Account.TotalChatMessage == nil {
@@ -1125,56 +1117,6 @@ func (ec *executionContext) fieldContext_Account_totalChatMessage(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Account_posts(ctx context.Context, field graphql.CollectedField, obj *model.Account) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Account_posts(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Posts, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Post)
-	fc.Result = res
-	return ec.marshalNPost2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPost(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Account_posts(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Account",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Post_id(ctx, field)
-			case "author":
-				return ec.fieldContext_Post_author(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _ChatMessage_id(ctx context.Context, field graphql.CollectedField, obj *model.ChatMessage) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ChatMessage_id(ctx, field)
 	if err != nil {
@@ -1270,8 +1212,6 @@ func (ec *executionContext) fieldContext_ChatMessage_sender(_ context.Context, f
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -1374,8 +1314,6 @@ func (ec *executionContext) fieldContext_ChatRoom_participants(_ context.Context
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -1617,8 +1555,6 @@ func (ec *executionContext) fieldContext_Mutation_createAccount(ctx context.Cont
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -1688,8 +1624,6 @@ func (ec *executionContext) fieldContext_Mutation_updateAccount(ctx context.Cont
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -1759,8 +1693,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteAccount(ctx context.Cont
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -1874,8 +1806,6 @@ func (ec *executionContext) fieldContext_Post_author(_ context.Context, field gr
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -1934,8 +1864,6 @@ func (ec *executionContext) fieldContext_Query_accounts(_ context.Context, field
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -1991,8 +1919,6 @@ func (ec *executionContext) fieldContext_Query_account(ctx context.Context, fiel
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -4357,11 +4283,6 @@ func (ec *executionContext) _Account(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "posts":
-			out.Values[i] = ec._Account_posts(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5349,44 +5270,6 @@ func (ec *executionContext) marshalNPost2socialᚑmediaᚑbackendᚑ1ᚋinternal
 	return ec._Post(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPost2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v []*model.Post) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOPost2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPost(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
 func (ec *executionContext) marshalNPost2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -5937,13 +5820,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
-}
-
-func (ec *executionContext) marshalOPost2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Post(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v any) (string, error) {

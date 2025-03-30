@@ -8,7 +8,6 @@ type Account {
   password: String!
   totalPostLike: Float!
   totalChatMessage: Float!
-  posts: [Post]!
 }
 
 extend type Post @key(fields: "id") {

@@ -9,7 +9,6 @@ type Account struct {
 	Password         string  `json:"password"`
 	TotalPostLike    float64 `json:"totalPostLike"`
 	TotalChatMessage float64 `json:"totalChatMessage"`
-	Posts            []*Post `json:"posts"`
 }
 
 type AccountInput struct {

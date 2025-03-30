@@ -5,22 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71953d37-8715-42c5-b1f9-b5bb73b7f1dd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/internal/outers/container/middleware_container.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/dataloader.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/inners/models/entities/account.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/models/entities/account.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/container/root_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/root_container.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/entity.resolvers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/entity.resolvers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/federation.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/federation.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/generated.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/generated.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/model/models_gen.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/model/models_gen.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/resolver.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/resolver.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.graphqls" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.graphqls" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/middlewares/transaction_middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/middlewares/transaction_middleware.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +53,11 @@
     "onboarding.tips.debug.path": "C:/data/apps/social-media-backend-1/main.go",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "com.apollographql.ijplugin.settings.lsp.LspSettingsConfigurable"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
+    ]
   }
 }]]></component>
   <component name="RecentsManager">

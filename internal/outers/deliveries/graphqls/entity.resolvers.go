@@ -6,8 +6,39 @@ package graphqls
 
 import (
 	"context"
+	"fmt"
 	"social-media-backend-1/internal/outers/deliveries/graphqls/model"
+
+	"github.com/google/uuid"
 )
+
+// FindAccountByID is the resolver for the findAccountByID field.
+func (r *entityResolver) FindAccountByID(ctx context.Context, id string) (*model.Account, error) {
+	convertedId, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
+	if err != nil {
+		return nil, err
+	}
+
+	if foundAccount == nil {
+		return nil, fmt.Errorf("account not found")
+	}
+
+	result := &model.Account{
+		ID:               foundAccount.ID.String(),
+		Name:             foundAccount.Name,
+		Email:            foundAccount.Email,
+		Password:         foundAccount.Password,
+		TotalPostLike:    foundAccount.TotalPostLike,
+		TotalChatMessage: foundAccount.TotalChatMessage,
+	}
+
+	return result, nil
+}
 
 // FindChatMessageByID is the resolver for the findChatMessageByID field.
 func (r *entityResolver) FindChatMessageByID(ctx context.Context, id string) (*model.ChatMessage, error) {
@@ -27,9 +58,27 @@ func (r *entityResolver) FindChatRoomByID(ctx context.Context, id string) (*mode
 	return result, nil
 }
 
+// FindChatRoomMemberByID is the resolver for the findChatRoomMemberByID field.
+func (r *entityResolver) FindChatRoomMemberByID(ctx context.Context, id string) (*model.ChatRoomMember, error) {
+	result := &model.ChatRoomMember{
+		ID: id,
+	}
+
+	return result, nil
+}
+
 // FindPostByID is the resolver for the findPostByID field.
 func (r *entityResolver) FindPostByID(ctx context.Context, id string) (*model.Post, error) {
 	result := &model.Post{
+		ID: id,
+	}
+
+	return result, nil
+}
+
+// FindPostLikeByID is the resolver for the findPostLikeByID field.
+func (r *entityResolver) FindPostLikeByID(ctx context.Context, id string) (*model.PostLike, error) {
+	result := &model.PostLike{
 		ID: id,
 	}
 

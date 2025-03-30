@@ -1,7 +1,7 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
-type Account {
+type Account @key(fields: "id") {
   id: ID!
   name: String!
   email: String!
@@ -10,19 +10,39 @@ type Account {
   totalChatMessage: Float!
 }
 
-extend type Post @key(fields: "id") {
-  id: ID! @external
-  author: Account!
+type ChatMessage @key(fields: "id") @extends {
+  id: ID!
+  content: String!
+  account: Account!
+  room: ChatRoom!
 }
 
-extend type ChatRoom @key(fields: "id") {
-  id: ID! @external
-  participants: [Account!]!
+type ChatRoomMember @key(fields: "id") @extends {
+    id: ID!
+    account: Account!
+    room: ChatRoom!
 }
 
-extend type ChatMessage @key(fields: "id") {
-  id: ID! @external
-  sender: Account!
+type ChatRoom @key(fields: "id") @extends {
+  id: ID!
+  name: String!
+  description: String!
+  members: [ChatRoomMember]
+  messages: [ChatMessage]
+}
+
+type Post @key(fields: "id") @extends {
+  id: ID!
+  title: String!
+  content: String!
+  account: Account!
+  likes: [PostLike]
+}
+
+type PostLike @key(fields: "id") @extends {
+    id: ID!
+    post: Post!
+    account: Account!
 }
 
 type Query {

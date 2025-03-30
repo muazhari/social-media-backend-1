@@ -34,9 +34,8 @@ func (r *mutationResolver) CreateAccount(ctx context.Context, input model.Accoun
 		Name:             createdAccount.Name,
 		Email:            createdAccount.Email,
 		Password:         createdAccount.Password,
-		TotalPostLike:    0,
-		TotalChatMessage: 0,
-		Posts:            nil,
+		TotalPostLike:    createdAccount.TotalPostLike,
+		TotalChatMessage: createdAccount.TotalChatMessage,
 	}
 
 	return result, nil
@@ -71,9 +70,8 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, id string, input m
 		Name:             updatedAccount.Name,
 		Email:            updatedAccount.Email,
 		Password:         updatedAccount.Password,
-		TotalPostLike:    0,
-		TotalChatMessage: 0,
-		Posts:            nil,
+		TotalPostLike:    updatedAccount.TotalPostLike,
+		TotalChatMessage: updatedAccount.TotalChatMessage,
 	}
 
 	return result, nil
@@ -105,9 +103,8 @@ func (r *mutationResolver) DeleteAccount(ctx context.Context, id string) (*model
 		Name:             deletedAccount.Name,
 		Email:            deletedAccount.Email,
 		Password:         deletedAccount.Password,
-		TotalPostLike:    0,
-		TotalChatMessage: 0,
-		Posts:            nil,
+		TotalPostLike:    deletedAccount.TotalPostLike,
+		TotalChatMessage: deletedAccount.TotalChatMessage,
 	}
 
 	return result, nil
@@ -115,21 +112,20 @@ func (r *mutationResolver) DeleteAccount(ctx context.Context, id string) (*model
 
 // Accounts is the resolver for the accounts field.
 func (r *queryResolver) Accounts(ctx context.Context) ([]*model.Account, error) {
-	accounts, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAllAccounts()
+	foundAccounts, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAllAccounts()
 	if err != nil {
 		return nil, err
 	}
 
 	var result []*model.Account
-	for _, account := range accounts {
+	for _, foundAccount := range foundAccounts {
 		result = append(result, &model.Account{
-			ID:               account.ID.String(),
-			Name:             account.Name,
-			Email:            account.Email,
-			Password:         account.Password,
-			TotalPostLike:    0,
-			TotalChatMessage: 0,
-			Posts:            nil,
+			ID:               foundAccount.ID.String(),
+			Name:             foundAccount.Name,
+			Email:            foundAccount.Email,
+			Password:         foundAccount.Password,
+			TotalPostLike:    foundAccount.TotalPostLike,
+			TotalChatMessage: foundAccount.TotalChatMessage,
 		})
 	}
 
@@ -157,9 +153,8 @@ func (r *queryResolver) Account(ctx context.Context, id string) (*model.Account,
 		Name:             foundAccount.Name,
 		Email:            foundAccount.Email,
 		Password:         foundAccount.Password,
-		TotalPostLike:    0,
-		TotalChatMessage: 0,
-		Posts:            nil,
+		TotalPostLike:    foundAccount.TotalPostLike,
+		TotalChatMessage: foundAccount.TotalChatMessage,
 	}
 
 	return result, nil

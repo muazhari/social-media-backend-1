@@ -11,6 +11,8 @@ type Account struct {
 	TotalChatMessage float64 `json:"totalChatMessage"`
 }
 
+func (Account) IsEntity() {}
+
 type AccountInput struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
@@ -18,28 +20,52 @@ type AccountInput struct {
 }
 
 type ChatMessage struct {
-	ID     string   `json:"id"`
-	Sender *Account `json:"sender"`
+	ID      string    `json:"id"`
+	Content string    `json:"content"`
+	Account *Account  `json:"account"`
+	Room    *ChatRoom `json:"room"`
 }
 
 func (ChatMessage) IsEntity() {}
 
 type ChatRoom struct {
-	ID           string     `json:"id"`
-	Participants []*Account `json:"participants"`
+	ID          string            `json:"id"`
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	Members     []*ChatRoomMember `json:"members,omitempty"`
+	Messages    []*ChatMessage    `json:"messages,omitempty"`
 }
 
 func (ChatRoom) IsEntity() {}
+
+type ChatRoomMember struct {
+	ID      string    `json:"id"`
+	Account *Account  `json:"account"`
+	Room    *ChatRoom `json:"room"`
+}
+
+func (ChatRoomMember) IsEntity() {}
 
 type Mutation struct {
 }
 
 type Post struct {
-	ID     string   `json:"id"`
-	Author *Account `json:"author"`
+	ID      string      `json:"id"`
+	Title   string      `json:"title"`
+	Content string      `json:"content"`
+	Account *Account    `json:"account"`
+	Likes   []*PostLike `json:"likes,omitempty"`
 }
 
 func (Post) IsEntity() {}
+
+type PostLike struct {
+	ID      string   `json:"id"`
+	Post    *Post    `json:"post"`
+	Account *Account `json:"account"`
+}
+
+func (PostLike) IsEntity() {}
 
 type Query struct {
 }

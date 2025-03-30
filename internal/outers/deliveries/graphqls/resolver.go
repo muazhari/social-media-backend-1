@@ -48,7 +48,6 @@ func (r *Resolver) GetAccountsByIds(ctx context.Context, ids []string) ([]*model
 			Password:         account.Password,
 			TotalPostLike:    account.TotalPostLike,
 			TotalChatMessage: account.TotalChatMessage,
-			Posts:            nil,
 		}
 		results = append(results, result)
 	}

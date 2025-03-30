@@ -153,6 +153,25 @@ func (ec *executionContext) resolveEntity(
 	}()
 
 	switch typeName {
+	case "Account":
+		resolverName, err := entityResolverNameForAccount(ctx, rep)
+		if err != nil {
+			return nil, fmt.Errorf(`finding resolver for Entity "Account": %w`, err)
+		}
+		switch resolverName {
+
+		case "findAccountByID":
+			id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+			if err != nil {
+				return nil, fmt.Errorf(`unmarshalling param 0 for findAccountByID(): %w`, err)
+			}
+			entity, err := ec.resolvers.Entity().FindAccountByID(ctx, id0)
+			if err != nil {
+				return nil, fmt.Errorf(`resolving Entity "Account": %w`, err)
+			}
+
+			return entity, nil
+		}
 	case "ChatMessage":
 		resolverName, err := entityResolverNameForChatMessage(ctx, rep)
 		if err != nil {
@@ -191,6 +210,25 @@ func (ec *executionContext) resolveEntity(
 
 			return entity, nil
 		}
+	case "ChatRoomMember":
+		resolverName, err := entityResolverNameForChatRoomMember(ctx, rep)
+		if err != nil {
+			return nil, fmt.Errorf(`finding resolver for Entity "ChatRoomMember": %w`, err)
+		}
+		switch resolverName {
+
+		case "findChatRoomMemberByID":
+			id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+			if err != nil {
+				return nil, fmt.Errorf(`unmarshalling param 0 for findChatRoomMemberByID(): %w`, err)
+			}
+			entity, err := ec.resolvers.Entity().FindChatRoomMemberByID(ctx, id0)
+			if err != nil {
+				return nil, fmt.Errorf(`resolving Entity "ChatRoomMember": %w`, err)
+			}
+
+			return entity, nil
+		}
 	case "Post":
 		resolverName, err := entityResolverNameForPost(ctx, rep)
 		if err != nil {
@@ -206,6 +244,25 @@ func (ec *executionContext) resolveEntity(
 			entity, err := ec.resolvers.Entity().FindPostByID(ctx, id0)
 			if err != nil {
 				return nil, fmt.Errorf(`resolving Entity "Post": %w`, err)
+			}
+
+			return entity, nil
+		}
+	case "PostLike":
+		resolverName, err := entityResolverNameForPostLike(ctx, rep)
+		if err != nil {
+			return nil, fmt.Errorf(`finding resolver for Entity "PostLike": %w`, err)
+		}
+		switch resolverName {
+
+		case "findPostLikeByID":
+			id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+			if err != nil {
+				return nil, fmt.Errorf(`unmarshalling param 0 for findPostLikeByID(): %w`, err)
+			}
+			entity, err := ec.resolvers.Entity().FindPostLikeByID(ctx, id0)
+			if err != nil {
+				return nil, fmt.Errorf(`resolving Entity "PostLike": %w`, err)
 			}
 
 			return entity, nil
@@ -234,6 +291,41 @@ func (ec *executionContext) resolveManyEntities(
 	default:
 		return errors.New("unknown type: " + typeName)
 	}
+}
+
+func entityResolverNameForAccount(ctx context.Context, rep EntityRepresentation) (string, error) {
+	// we collect errors because a later entity resolver may work fine
+	// when an entity has multiple keys
+	entityResolverErrs := []error{}
+	for {
+		var (
+			m   EntityRepresentation
+			val any
+			ok  bool
+		)
+		_ = val
+		// if all of the KeyFields values for this resolver are null,
+		// we shouldn't use use it
+		allNull := true
+		m = rep
+		val, ok = m["id"]
+		if !ok {
+			entityResolverErrs = append(entityResolverErrs,
+				fmt.Errorf("%w due to missing Key Field \"id\" for Account", ErrTypeNotFound))
+			break
+		}
+		if allNull {
+			allNull = val == nil
+		}
+		if allNull {
+			entityResolverErrs = append(entityResolverErrs,
+				fmt.Errorf("%w due to all null value KeyFields for Account", ErrTypeNotFound))
+			break
+		}
+		return "findAccountByID", nil
+	}
+	return "", fmt.Errorf("%w for Account due to %v", ErrTypeNotFound,
+		errors.Join(entityResolverErrs...).Error())
 }
 
 func entityResolverNameForChatMessage(ctx context.Context, rep EntityRepresentation) (string, error) {
@@ -306,6 +398,41 @@ func entityResolverNameForChatRoom(ctx context.Context, rep EntityRepresentation
 		errors.Join(entityResolverErrs...).Error())
 }
 
+func entityResolverNameForChatRoomMember(ctx context.Context, rep EntityRepresentation) (string, error) {
+	// we collect errors because a later entity resolver may work fine
+	// when an entity has multiple keys
+	entityResolverErrs := []error{}
+	for {
+		var (
+			m   EntityRepresentation
+			val any
+			ok  bool
+		)
+		_ = val
+		// if all of the KeyFields values for this resolver are null,
+		// we shouldn't use use it
+		allNull := true
+		m = rep
+		val, ok = m["id"]
+		if !ok {
+			entityResolverErrs = append(entityResolverErrs,
+				fmt.Errorf("%w due to missing Key Field \"id\" for ChatRoomMember", ErrTypeNotFound))
+			break
+		}
+		if allNull {
+			allNull = val == nil
+		}
+		if allNull {
+			entityResolverErrs = append(entityResolverErrs,
+				fmt.Errorf("%w due to all null value KeyFields for ChatRoomMember", ErrTypeNotFound))
+			break
+		}
+		return "findChatRoomMemberByID", nil
+	}
+	return "", fmt.Errorf("%w for ChatRoomMember due to %v", ErrTypeNotFound,
+		errors.Join(entityResolverErrs...).Error())
+}
+
 func entityResolverNameForPost(ctx context.Context, rep EntityRepresentation) (string, error) {
 	// we collect errors because a later entity resolver may work fine
 	// when an entity has multiple keys
@@ -338,5 +465,40 @@ func entityResolverNameForPost(ctx context.Context, rep EntityRepresentation) (s
 		return "findPostByID", nil
 	}
 	return "", fmt.Errorf("%w for Post due to %v", ErrTypeNotFound,
+		errors.Join(entityResolverErrs...).Error())
+}
+
+func entityResolverNameForPostLike(ctx context.Context, rep EntityRepresentation) (string, error) {
+	// we collect errors because a later entity resolver may work fine
+	// when an entity has multiple keys
+	entityResolverErrs := []error{}
+	for {
+		var (
+			m   EntityRepresentation
+			val any
+			ok  bool
+		)
+		_ = val
+		// if all of the KeyFields values for this resolver are null,
+		// we shouldn't use use it
+		allNull := true
+		m = rep
+		val, ok = m["id"]
+		if !ok {
+			entityResolverErrs = append(entityResolverErrs,
+				fmt.Errorf("%w due to missing Key Field \"id\" for PostLike", ErrTypeNotFound))
+			break
+		}
+		if allNull {
+			allNull = val == nil
+		}
+		if allNull {
+			entityResolverErrs = append(entityResolverErrs,
+				fmt.Errorf("%w due to all null value KeyFields for PostLike", ErrTypeNotFound))
+			break
+		}
+		return "findPostLikeByID", nil
+	}
+	return "", fmt.Errorf("%w for PostLike due to %v", ErrTypeNotFound,
 		errors.Join(entityResolverErrs...).Error())
 }

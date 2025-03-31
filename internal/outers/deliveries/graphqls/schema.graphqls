@@ -2,47 +2,54 @@
 #
 # https://gqlgen.com/getting-started/
 type Account @key(fields: "id") {
-  id: ID!
-  name: String!
-  email: String!
-  password: String!
-  totalPostLike: Float!
-  totalChatMessage: Float!
+    id: ID!
+    name: String!
+    email: String!
+    password: String!
+    totalPostLike: Float!
+    totalChatMessage: Float!
+    messages: [ChatMessage] @external
+    rooms: [ChatRoom] @external
+    posts: [Post] @external
 }
 
 type ChatMessage @key(fields: "id") @extends {
-  id: ID!
-  content: String!
-  account: Account!
-  room: ChatRoom!
+    id: ID! @external
+    content: String! @external
+    accountId: ID! @external
+    account: Account! @requires(fields: "accountId")
+    room: ChatRoom! @external
 }
 
 type ChatRoomMember @key(fields: "id") @extends {
-    id: ID!
-    account: Account!
-    room: ChatRoom!
+    id: ID! @external
+    accountId: ID! @external
+    account: Account! @requires(fields: "accountId")
+    room: ChatRoom! @external
 }
 
 type ChatRoom @key(fields: "id") @extends {
-  id: ID!
-  name: String!
-  description: String!
-  members: [ChatRoomMember]
-  messages: [ChatMessage]
+    id: ID! @external
+    name: String! @external
+    description: String! @external
+    members: [ChatRoomMember] @external
+    messages: [ChatMessage] @external
 }
 
 type Post @key(fields: "id") @extends {
-  id: ID!
-  title: String!
-  content: String!
-  account: Account!
-  likes: [PostLike]
+    id: ID! @external
+    title: String! @external
+    content: String! @external
+    accountId: ID! @external
+    account: Account! @requires(fields: "accountId")
+    likes: [PostLike] @external
 }
 
 type PostLike @key(fields: "id") @extends {
-    id: ID!
-    post: Post!
-    account: Account!
+    id: ID! @external
+    post: Post! @external
+    accountId: ID! @external
+    account: Account! @requires(fields: "accountId")
 }
 
 type Query {

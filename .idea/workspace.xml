@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71953d37-8715-42c5-b1f9-b5bb73b7f1dd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/entity.resolvers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/entity.resolvers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/federation.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/federation.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/generated.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/generated.go" afterDir="false" />

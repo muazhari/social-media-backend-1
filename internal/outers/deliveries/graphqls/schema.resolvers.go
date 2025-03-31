@@ -13,6 +13,72 @@ import (
 	"github.com/google/uuid"
 )
 
+// Account is the resolver for the account field.
+func (r *chatMessageResolver) Account(ctx context.Context, obj *model.ChatMessage, federationRequires map[string]any) (*model.Account, error) {
+	accountId, ok := federationRequires["accountId"].(string)
+	if !ok {
+		return nil, fmt.Errorf("account id is required")
+	}
+
+	convertedId, err := uuid.Parse(accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
+	if err != nil {
+		return nil, err
+	}
+
+	if foundAccount == nil {
+		return nil, fmt.Errorf("account not found")
+	}
+
+	result := &model.Account{
+		ID:               foundAccount.ID.String(),
+		Name:             foundAccount.Name,
+		Email:            foundAccount.Email,
+		Password:         foundAccount.Password,
+		TotalPostLike:    foundAccount.TotalPostLike,
+		TotalChatMessage: foundAccount.TotalChatMessage,
+	}
+
+	return result, nil
+}
+
+// Account is the resolver for the account field.
+func (r *chatRoomMemberResolver) Account(ctx context.Context, obj *model.ChatRoomMember, federationRequires map[string]any) (*model.Account, error) {
+	accountId, ok := federationRequires["accountId"].(string)
+	if !ok {
+		return nil, fmt.Errorf("account id is required")
+	}
+
+	convertedId, err := uuid.Parse(accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
+	if err != nil {
+		return nil, err
+	}
+
+	if foundAccount == nil {
+		return nil, fmt.Errorf("account not found")
+	}
+
+	result := &model.Account{
+		ID:               foundAccount.ID.String(),
+		Name:             foundAccount.Name,
+		Email:            foundAccount.Email,
+		Password:         foundAccount.Password,
+		TotalPostLike:    foundAccount.TotalPostLike,
+		TotalChatMessage: foundAccount.TotalChatMessage,
+	}
+
+	return result, nil
+}
+
 // CreateAccount is the resolver for the createAccount field.
 func (r *mutationResolver) CreateAccount(ctx context.Context, input model.AccountInput) (*model.Account, error) {
 	account := &entities.Account{
@@ -110,6 +176,72 @@ func (r *mutationResolver) DeleteAccount(ctx context.Context, id string) (*model
 	return result, nil
 }
 
+// Account is the resolver for the account field.
+func (r *postResolver) Account(ctx context.Context, obj *model.Post, federationRequires map[string]any) (*model.Account, error) {
+	accountId, ok := federationRequires["accountId"].(string)
+	if !ok {
+		return nil, fmt.Errorf("account id is required")
+	}
+
+	convertedId, err := uuid.Parse(accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
+	if err != nil {
+		return nil, err
+	}
+
+	if foundAccount == nil {
+		return nil, fmt.Errorf("account not found")
+	}
+
+	result := &model.Account{
+		ID:               foundAccount.ID.String(),
+		Name:             foundAccount.Name,
+		Email:            foundAccount.Email,
+		Password:         foundAccount.Password,
+		TotalPostLike:    foundAccount.TotalPostLike,
+		TotalChatMessage: foundAccount.TotalChatMessage,
+	}
+
+	return result, nil
+}
+
+// Account is the resolver for the account field.
+func (r *postLikeResolver) Account(ctx context.Context, obj *model.PostLike, federationRequires map[string]any) (*model.Account, error) {
+	accountId, ok := federationRequires["accountId"].(string)
+	if !ok {
+		return nil, fmt.Errorf("account id is required")
+	}
+
+	convertedId, err := uuid.Parse(accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
+	if err != nil {
+		return nil, err
+	}
+
+	if foundAccount == nil {
+		return nil, fmt.Errorf("account not found")
+	}
+
+	result := &model.Account{
+		ID:               foundAccount.ID.String(),
+		Name:             foundAccount.Name,
+		Email:            foundAccount.Email,
+		Password:         foundAccount.Password,
+		TotalPostLike:    foundAccount.TotalPostLike,
+		TotalChatMessage: foundAccount.TotalChatMessage,
+	}
+
+	return result, nil
+}
+
 // Accounts is the resolver for the accounts field.
 func (r *queryResolver) Accounts(ctx context.Context) ([]*model.Account, error) {
 	foundAccounts, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAllAccounts()
@@ -160,11 +292,27 @@ func (r *queryResolver) Account(ctx context.Context, id string) (*model.Account,
 	return result, nil
 }
 
+// ChatMessage returns ChatMessageResolver implementation.
+func (r *Resolver) ChatMessage() ChatMessageResolver { return &chatMessageResolver{r} }
+
+// ChatRoomMember returns ChatRoomMemberResolver implementation.
+func (r *Resolver) ChatRoomMember() ChatRoomMemberResolver { return &chatRoomMemberResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
+// Post returns PostResolver implementation.
+func (r *Resolver) Post() PostResolver { return &postResolver{r} }
+
+// PostLike returns PostLikeResolver implementation.
+func (r *Resolver) PostLike() PostLikeResolver { return &postLikeResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type chatMessageResolver struct{ *Resolver }
+type chatRoomMemberResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
+type postResolver struct{ *Resolver }
+type postLikeResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

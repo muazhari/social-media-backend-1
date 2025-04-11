@@ -12,6 +12,7 @@ type Account struct {
 	Messages         []*ChatMessage `json:"messages,omitempty"`
 	Rooms            []*ChatRoom    `json:"rooms,omitempty"`
 	Posts            []*Post        `json:"posts,omitempty"`
+	PostLikes        []*PostLike    `json:"postLikes,omitempty"`
 }
 
 func (Account) IsEntity() {}

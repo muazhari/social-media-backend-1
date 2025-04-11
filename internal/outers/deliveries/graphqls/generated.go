@@ -59,6 +59,7 @@ type ComplexityRoot struct {
 		Messages         func(childComplexity int) int
 		Name             func(childComplexity int) int
 		Password         func(childComplexity int) int
+		PostLikes        func(childComplexity int) int
 		Posts            func(childComplexity int) int
 		Rooms            func(childComplexity int) int
 		TotalChatMessage func(childComplexity int) int
@@ -237,6 +238,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Account.Password(childComplexity), true
+
+	case "Account.postLikes":
+		if e.complexity.Account.PostLikes == nil {
+			break
+		}
+
+		return e.complexity.Account.PostLikes(childComplexity), true
 
 	case "Account.posts":
 		if e.complexity.Account.Posts == nil {
@@ -1765,6 +1773,57 @@ func (ec *executionContext) fieldContext_Account_posts(_ context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Account_postLikes(ctx context.Context, field graphql.CollectedField, obj *model.Account) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Account_postLikes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PostLikes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.PostLike)
+	fc.Result = res
+	return ec.marshalOPostLike2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPostLike(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Account_postLikes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Account",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PostLike_id(ctx, field)
+			case "post":
+				return ec.fieldContext_PostLike_post(ctx, field)
+			case "accountId":
+				return ec.fieldContext_PostLike_accountId(ctx, field)
+			case "account":
+				return ec.fieldContext_PostLike_account(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PostLike", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ChatMessage_id(ctx context.Context, field graphql.CollectedField, obj *model.ChatMessage) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ChatMessage_id(ctx, field)
 	if err != nil {
@@ -1954,6 +2013,8 @@ func (ec *executionContext) fieldContext_ChatMessage_account(ctx context.Context
 				return ec.fieldContext_Account_rooms(ctx, field)
 			case "posts":
 				return ec.fieldContext_Account_posts(ctx, field)
+			case "postLikes":
+				return ec.fieldContext_Account_postLikes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -2409,6 +2470,8 @@ func (ec *executionContext) fieldContext_ChatRoomMember_account(ctx context.Cont
 				return ec.fieldContext_Account_rooms(ctx, field)
 			case "posts":
 				return ec.fieldContext_Account_posts(ctx, field)
+			case "postLikes":
+				return ec.fieldContext_Account_postLikes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -2540,6 +2603,8 @@ func (ec *executionContext) fieldContext_Entity_findAccountByID(ctx context.Cont
 				return ec.fieldContext_Account_rooms(ctx, field)
 			case "posts":
 				return ec.fieldContext_Account_posts(ctx, field)
+			case "postLikes":
+				return ec.fieldContext_Account_postLikes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -2881,6 +2946,8 @@ func (ec *executionContext) fieldContext_Mutation_createAccount(ctx context.Cont
 				return ec.fieldContext_Account_rooms(ctx, field)
 			case "posts":
 				return ec.fieldContext_Account_posts(ctx, field)
+			case "postLikes":
+				return ec.fieldContext_Account_postLikes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -2956,6 +3023,8 @@ func (ec *executionContext) fieldContext_Mutation_updateAccount(ctx context.Cont
 				return ec.fieldContext_Account_rooms(ctx, field)
 			case "posts":
 				return ec.fieldContext_Account_posts(ctx, field)
+			case "postLikes":
+				return ec.fieldContext_Account_postLikes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3031,6 +3100,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteAccount(ctx context.Cont
 				return ec.fieldContext_Account_rooms(ctx, field)
 			case "posts":
 				return ec.fieldContext_Account_posts(ctx, field)
+			case "postLikes":
+				return ec.fieldContext_Account_postLikes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3282,6 +3353,8 @@ func (ec *executionContext) fieldContext_Post_account(ctx context.Context, field
 				return ec.fieldContext_Account_rooms(ctx, field)
 			case "posts":
 				return ec.fieldContext_Account_posts(ctx, field)
+			case "postLikes":
+				return ec.fieldContext_Account_postLikes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3554,6 +3627,8 @@ func (ec *executionContext) fieldContext_PostLike_account(ctx context.Context, f
 				return ec.fieldContext_Account_rooms(ctx, field)
 			case "posts":
 				return ec.fieldContext_Account_posts(ctx, field)
+			case "postLikes":
+				return ec.fieldContext_Account_postLikes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3629,6 +3704,8 @@ func (ec *executionContext) fieldContext_Query_accounts(_ context.Context, field
 				return ec.fieldContext_Account_rooms(ctx, field)
 			case "posts":
 				return ec.fieldContext_Account_posts(ctx, field)
+			case "postLikes":
+				return ec.fieldContext_Account_postLikes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3690,6 +3767,8 @@ func (ec *executionContext) fieldContext_Query_account(ctx context.Context, fiel
 				return ec.fieldContext_Account_rooms(ctx, field)
 			case "posts":
 				return ec.fieldContext_Account_posts(ctx, field)
+			case "postLikes":
+				return ec.fieldContext_Account_postLikes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -6081,6 +6160,8 @@ func (ec *executionContext) _Account(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Account_rooms(ctx, field, obj)
 		case "posts":
 			out.Values[i] = ec._Account_posts(ctx, field, obj)
+		case "postLikes":
+			out.Values[i] = ec._Account_postLikes(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

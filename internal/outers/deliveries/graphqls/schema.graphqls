@@ -11,6 +11,7 @@ type Account @key(fields: "id") {
     messages: [ChatMessage] @external
     rooms: [ChatRoom] @external
     posts: [Post] @external
+    postLikes: [PostLike] @external
 }
 
 type ChatMessage @key(fields: "id") @extends {

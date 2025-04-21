@@ -81,8 +81,13 @@ func (r *chatRoomMemberResolver) Account(ctx context.Context, obj *model.ChatRoo
 
 // CreateAccount is the resolver for the createAccount field.
 func (r *mutationResolver) CreateAccount(ctx context.Context, input model.AccountInput) (*model.Account, error) {
+	id, err := uuid.NewUUID()
+	if err != nil {
+		return nil, err
+	}
+
 	account := &entities.Account{
-		ID:               uuid.New(),
+		ID:               &id,
 		Name:             input.Name,
 		Email:            input.Email,
 		Password:         input.Password,

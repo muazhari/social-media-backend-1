@@ -80,7 +80,7 @@ func (r *AccountRepository) GetAccountById(id uuid.UUID) (*entities.Account, err
 	return account, nil
 }
 
-func (r *AccountRepository) GetAccountsByIds(ids []uuid.UUID) ([]*entities.Account, []error) {
+func (r *AccountRepository) GetAccountsByIds(ids []*uuid.UUID) ([]*entities.Account, []error) {
 	query := `
 		SELECT COALESCE(json_agg(json_build_object(
 			'id', id,
@@ -132,7 +132,7 @@ func (r *AccountRepository) CreateAccount(account *entities.Account) (*entities.
 		return nil, fmt.Errorf("database insert failed: %w", err)
 	}
 
-	createdAccount, err := r.GetAccountById(account.ID)
+	createdAccount, err := r.GetAccountById(*account.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve created account: %w", err)
 	}

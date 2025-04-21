@@ -25,13 +25,13 @@ func NewResolver(rootContainer *container.RootContainer) *Resolver {
 }
 
 func (r *Resolver) GetAccountsByIds(ctx context.Context, ids []string) ([]*model.Account, []error) {
-	var convertedIds []uuid.UUID
+	var convertedIds []*uuid.UUID
 	for _, id := range ids {
 		convertedId, err := uuid.Parse(id)
 		if err != nil {
 			return nil, []error{err}
 		}
-		convertedIds = append(convertedIds, convertedId)
+		convertedIds = append(convertedIds, &convertedId)
 	}
 
 	accounts, err := r.RootContainer.RepositoryContainer.AccountRepository.GetAccountsByIds(convertedIds)

@@ -91,7 +91,7 @@ func (r *AccountRepository) GetAccountsByIds(ids []*uuid.UUID) ([]*entities.Acco
 			'total_chat_message', total_chat_message
 		)), '[]'::json) as item
 		FROM account
-		WHERE id IN ($1)
+		WHERE id = ANY($1)
 	`
 
 	var jsonData []byte

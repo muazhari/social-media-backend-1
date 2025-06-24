@@ -15,15 +15,8 @@ import (
 	"social-media-backend-1/internal/outers/deliveries/graphqls"
 )
 
-const (
-	defaultPort = "8081"
-)
-
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
+	port := os.Getenv("BACKEND_1_PORT")
 
 	rootContainer := container.NewRootContainer()
 
@@ -41,9 +34,14 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
-	http.Handle("/graphql", srv)
+	mux := http.NewServeMux()
+	mux.Handle("/graphql", srv)
+	mux.Handle("/graphiql", playground.Handler("GraphQL playground", "/graphql"))
 
-	log.Printf("connect to http://0.0.0.0:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, nil))
+	addr := "0.0.0.0:" + port
+	httpServer := &http.Server{
+		Addr:    addr,
+		Handler: mux,
+	}
+	log.Fatal(httpServer.ListenAndServe())
 }

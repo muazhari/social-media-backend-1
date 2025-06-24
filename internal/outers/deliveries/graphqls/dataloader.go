@@ -14,7 +14,7 @@ func NewDataloader(resolver *Resolver) *Dataloader {
 	return &Dataloader{
 		AccountDataloader: dataloadgen.NewLoader[string, *model.Account](
 			resolver.GetAccountsByIds,
-			dataloadgen.WithWait(time.Millisecond),
+			dataloadgen.WithWait(10*time.Millisecond),
 		),
 	}
 }

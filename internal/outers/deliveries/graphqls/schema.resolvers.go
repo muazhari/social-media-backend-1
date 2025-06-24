@@ -7,10 +7,9 @@ package graphqls
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"social-media-backend-1/internal/inners/models/entities"
 	"social-media-backend-1/internal/outers/deliveries/graphqls/model"
-
-	"github.com/google/uuid"
 )
 
 // Account is the resolver for the account field.
@@ -20,30 +19,7 @@ func (r *chatMessageResolver) Account(ctx context.Context, obj *model.ChatMessag
 		return nil, fmt.Errorf("account id is required")
 	}
 
-	convertedId, err := uuid.Parse(accountId)
-	if err != nil {
-		return nil, err
-	}
-
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
-	if err != nil {
-		return nil, err
-	}
-
-	if foundAccount == nil {
-		return nil, fmt.Errorf("account not found")
-	}
-
-	result := &model.Account{
-		ID:               foundAccount.ID.String(),
-		Name:             foundAccount.Name,
-		Email:            foundAccount.Email,
-		Password:         foundAccount.Password,
-		TotalPostLike:    foundAccount.TotalPostLike,
-		TotalChatMessage: foundAccount.TotalChatMessage,
-	}
-
-	return result, nil
+	return r.Dataloader.AccountDataloader.Load(ctx, accountId)
 }
 
 // Account is the resolver for the account field.
@@ -53,30 +29,7 @@ func (r *chatRoomMemberResolver) Account(ctx context.Context, obj *model.ChatRoo
 		return nil, fmt.Errorf("account id is required")
 	}
 
-	convertedId, err := uuid.Parse(accountId)
-	if err != nil {
-		return nil, err
-	}
-
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
-	if err != nil {
-		return nil, err
-	}
-
-	if foundAccount == nil {
-		return nil, fmt.Errorf("account not found")
-	}
-
-	result := &model.Account{
-		ID:               foundAccount.ID.String(),
-		Name:             foundAccount.Name,
-		Email:            foundAccount.Email,
-		Password:         foundAccount.Password,
-		TotalPostLike:    foundAccount.TotalPostLike,
-		TotalChatMessage: foundAccount.TotalChatMessage,
-	}
-
-	return result, nil
+	return r.Dataloader.AccountDataloader.Load(ctx, accountId)
 }
 
 // CreateAccount is the resolver for the createAccount field.
@@ -188,30 +141,7 @@ func (r *postResolver) Account(ctx context.Context, obj *model.Post, federationR
 		return nil, fmt.Errorf("account id is required")
 	}
 
-	convertedId, err := uuid.Parse(accountId)
-	if err != nil {
-		return nil, err
-	}
-
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
-	if err != nil {
-		return nil, err
-	}
-
-	if foundAccount == nil {
-		return nil, fmt.Errorf("account not found")
-	}
-
-	result := &model.Account{
-		ID:               foundAccount.ID.String(),
-		Name:             foundAccount.Name,
-		Email:            foundAccount.Email,
-		Password:         foundAccount.Password,
-		TotalPostLike:    foundAccount.TotalPostLike,
-		TotalChatMessage: foundAccount.TotalChatMessage,
-	}
-
-	return result, nil
+	return r.Dataloader.AccountDataloader.Load(ctx, accountId)
 }
 
 // Account is the resolver for the account field.
@@ -221,30 +151,7 @@ func (r *postLikeResolver) Account(ctx context.Context, obj *model.PostLike, fed
 		return nil, fmt.Errorf("account id is required")
 	}
 
-	convertedId, err := uuid.Parse(accountId)
-	if err != nil {
-		return nil, err
-	}
-
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
-	if err != nil {
-		return nil, err
-	}
-
-	if foundAccount == nil {
-		return nil, fmt.Errorf("account not found")
-	}
-
-	result := &model.Account{
-		ID:               foundAccount.ID.String(),
-		Name:             foundAccount.Name,
-		Email:            foundAccount.Email,
-		Password:         foundAccount.Password,
-		TotalPostLike:    foundAccount.TotalPostLike,
-		TotalChatMessage: foundAccount.TotalChatMessage,
-	}
-
-	return result, nil
+	return r.Dataloader.AccountDataloader.Load(ctx, accountId)
 }
 
 // Accounts is the resolver for the accounts field.
@@ -271,30 +178,7 @@ func (r *queryResolver) Accounts(ctx context.Context) ([]*model.Account, error) 
 
 // Account is the resolver for the account field.
 func (r *queryResolver) Account(ctx context.Context, id string) (*model.Account, error) {
-	convertedId, err := uuid.Parse(id)
-	if err != nil {
-		return nil, err
-	}
-
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
-	if err != nil {
-		return nil, err
-	}
-
-	if foundAccount == nil {
-		return nil, fmt.Errorf("account not found")
-	}
-
-	result := &model.Account{
-		ID:               foundAccount.ID.String(),
-		Name:             foundAccount.Name,
-		Email:            foundAccount.Email,
-		Password:         foundAccount.Password,
-		TotalPostLike:    foundAccount.TotalPostLike,
-		TotalChatMessage: foundAccount.TotalChatMessage,
-	}
-
-	return result, nil
+	return r.Dataloader.AccountDataloader.Load(ctx, id)
 }
 
 // ChatMessage returns ChatMessageResolver implementation.

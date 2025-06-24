@@ -5,18 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71953d37-8715-42c5-b1f9-b5bb73b7f1dd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/internal/inners/models/entities/chat_message.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/inners/models/entities/chat_room.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/inners/models/entities/chat_room_member.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/inners/models/entities/post.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/inners/models/entities/post_like.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/inners/models/entities/account.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/models/entities/account.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/resolver.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/resolver.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.resolvers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.resolvers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/dataloader.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/dataloader.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +39,8 @@
   "keyToString": {
     "DefaultGoTemplateProperty": "Go File",
     "Go Build.go build main.go.executor": "Debug",
+    "RunOnceActivity.GoLinterPluginOnboarding": "true",
+    "RunOnceActivity.GoLinterPluginStorageMigration": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
@@ -62,7 +54,7 @@
     "nodejs_package_manager_path": "npm",
     "onboarding.tips.debug.path": "C:/data/apps/social-media-backend-1/main.go",
     "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+    "settings.editor.selected.configurable": "preferences.sourceCode.Go"
   },
   "keyToStringList": {
     "DatabaseDriversLRU": [
@@ -116,12 +108,22 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-gosdk-d297c17c1fbd-57c114c3cede-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-243.26053.20" />
-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-GO-243.26053.20" />
+        <option value="bundled-gosdk-3b128438d3f6-07d2d2d66b1e-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-251.26927.50" />
+        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-GO-251.26927.50" />
       </set>
     </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="71953d37-8715-42c5-b1f9-b5bb73b7f1dd" name="Changes" comment="" />
+      <created>1750751387710</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1750751387710</updated>
+    </task>
+    <servers />
+  </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>

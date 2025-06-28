@@ -3,6 +3,7 @@ package container
 type RootContainer struct {
 	ConfigContainer     *ConfigContainer
 	RepositoryContainer *RepositoryContainer
+	GatewayContainer    *GatewayContainer
 	UseCaseContainer    *UseCaseContainer
 	MiddlewareContainer *MiddlewareContainer
 }
@@ -10,12 +11,14 @@ type RootContainer struct {
 func NewRootContainer() *RootContainer {
 	configContainer := NewConfigContainer()
 	repositoryContainer := NewRepositoryContainer(configContainer)
-	useCaseContainer := NewUseCaseContainer(repositoryContainer)
+	gatewayContainer := NewGatewayContainer(configContainer)
+	useCaseContainer := NewUseCaseContainer(repositoryContainer, gatewayContainer)
 	middlewareContainer := NewMiddlewareContainer(repositoryContainer)
 
 	return &RootContainer{
 		ConfigContainer:     configContainer,
 		RepositoryContainer: repositoryContainer,
+		GatewayContainer:    gatewayContainer,
 		UseCaseContainer:    useCaseContainer,
 		MiddlewareContainer: middlewareContainer,
 	}

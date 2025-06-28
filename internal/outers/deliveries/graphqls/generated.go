@@ -40,12 +40,8 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	ChatMessage() ChatMessageResolver
-	ChatRoomMember() ChatRoomMemberResolver
 	Entity() EntityResolver
 	Mutation() MutationResolver
-	Post() PostResolver
-	PostLike() PostLikeResolver
 	Query() QueryResolver
 }
 
@@ -64,7 +60,7 @@ type ComplexityRoot struct {
 	}
 
 	ChatMessage struct {
-		Account   func(childComplexity int, federationRequires map[string]any) int
+		Account   func(childComplexity int) int
 		AccountID func(childComplexity int) int
 		ID        func(childComplexity int) int
 	}
@@ -74,7 +70,7 @@ type ComplexityRoot struct {
 	}
 
 	ChatRoomMember struct {
-		Account   func(childComplexity int, federationRequires map[string]any) int
+		Account   func(childComplexity int) int
 		AccountID func(childComplexity int) int
 		ID        func(childComplexity int) int
 	}
@@ -82,7 +78,6 @@ type ComplexityRoot struct {
 	Entity struct {
 		FindAccountByID        func(childComplexity int, id string) int
 		FindChatMessageByID    func(childComplexity int, id string) int
-		FindChatRoomByID       func(childComplexity int, id string) int
 		FindChatRoomMemberByID func(childComplexity int, id string) int
 		FindPostByID           func(childComplexity int, id string) int
 		FindPostLikeByID       func(childComplexity int, id string) int
@@ -91,17 +86,18 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateAccount func(childComplexity int, input model.AccountInput) int
 		DeleteAccount func(childComplexity int, id string) int
+		Register      func(childComplexity int, input model.AccountInput) int
 		UpdateAccount func(childComplexity int, id string, input model.AccountInput) int
 	}
 
 	Post struct {
-		Account   func(childComplexity int, federationRequires map[string]any) int
+		Account   func(childComplexity int) int
 		AccountID func(childComplexity int) int
 		ID        func(childComplexity int) int
 	}
 
 	PostLike struct {
-		Account   func(childComplexity int, federationRequires map[string]any) int
+		Account   func(childComplexity int) int
 		AccountID func(childComplexity int) int
 		ID        func(childComplexity int) int
 	}
@@ -109,8 +105,14 @@ type ComplexityRoot struct {
 	Query struct {
 		Account            func(childComplexity int, id string) int
 		Accounts           func(childComplexity int) int
+		Login              func(childComplexity int, email string, password string) int
 		__resolve__service func(childComplexity int) int
 		__resolve_entities func(childComplexity int, representations []map[string]any) int
+	}
+
+	Session struct {
+		AccessToken  func(childComplexity int) int
+		RefreshToken func(childComplexity int) int
 	}
 
 	_Service struct {
@@ -118,60 +120,24 @@ type ComplexityRoot struct {
 	}
 }
 
-type ChatMessageResolver interface {
-	Account(ctx context.Context, obj *model.ChatMessage, federationRequires map[string]any) (*model.Account, error)
-}
-type ChatRoomMemberResolver interface {
-	Account(ctx context.Context, obj *model.ChatRoomMember, federationRequires map[string]any) (*model.Account, error)
-}
 type EntityResolver interface {
 	FindAccountByID(ctx context.Context, id string) (*model.Account, error)
 	FindChatMessageByID(ctx context.Context, id string) (*model.ChatMessage, error)
-	FindChatRoomByID(ctx context.Context, id string) (*model.ChatRoom, error)
 	FindChatRoomMemberByID(ctx context.Context, id string) (*model.ChatRoomMember, error)
 	FindPostByID(ctx context.Context, id string) (*model.Post, error)
 	FindPostLikeByID(ctx context.Context, id string) (*model.PostLike, error)
 }
 type MutationResolver interface {
+	Register(ctx context.Context, input model.AccountInput) (*model.Account, error)
 	CreateAccount(ctx context.Context, input model.AccountInput) (*model.Account, error)
 	UpdateAccount(ctx context.Context, id string, input model.AccountInput) (*model.Account, error)
 	DeleteAccount(ctx context.Context, id string) (*model.Account, error)
 }
-type PostResolver interface {
-	Account(ctx context.Context, obj *model.Post, federationRequires map[string]any) (*model.Account, error)
-}
-type PostLikeResolver interface {
-	Account(ctx context.Context, obj *model.PostLike, federationRequires map[string]any) (*model.Account, error)
-}
 type QueryResolver interface {
 	Accounts(ctx context.Context) ([]*model.Account, error)
 	Account(ctx context.Context, id string) (*model.Account, error)
+	Login(ctx context.Context, email string, password string) (*model.Session, error)
 }
-
-var (
-	builtInDirectivePopulateFromRepresentations = func(ctx context.Context, obj any, next graphql.Resolver) (res any, err error) {
-		fc := graphql.GetFieldContext(ctx)
-
-		// We get the Federation representations argument from the _entities resolver
-		representations, ok := fc.Parent.Parent.Args["representations"].([]map[string]any)
-		if !ok {
-			return nil, errors.New("must be called from within _entities")
-		}
-
-		// Get the index of the current entity in the representations list. This is
-		// set by the execution context after the _entities resolver is called.
-		index := fc.Parent.Index
-		if index == nil {
-			return nil, errors.New("couldn't find input index for entity")
-		}
-
-		if len(representations) < *index {
-			return nil, errors.New("representation not found")
-		}
-
-		return representations[*index], nil
-	}
-)
 
 type executableSchema struct {
 	schema     *ast.Schema
@@ -246,12 +212,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ChatMessage_account_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ChatMessage.Account(childComplexity, args["_federationRequires"].(map[string]any)), true
+		return e.complexity.ChatMessage.Account(childComplexity), true
 
 	case "ChatMessage.accountId":
 		if e.complexity.ChatMessage.AccountID == nil {
@@ -279,12 +240,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ChatRoomMember_account_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ChatRoomMember.Account(childComplexity, args["_federationRequires"].(map[string]any)), true
+		return e.complexity.ChatRoomMember.Account(childComplexity), true
 
 	case "ChatRoomMember.accountId":
 		if e.complexity.ChatRoomMember.AccountID == nil {
@@ -323,18 +279,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.FindChatMessageByID(childComplexity, args["id"].(string)), true
-
-	case "Entity.findChatRoomByID":
-		if e.complexity.Entity.FindChatRoomByID == nil {
-			break
-		}
-
-		args, err := ec.field_Entity_findChatRoomByID_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Entity.FindChatRoomByID(childComplexity, args["id"].(string)), true
 
 	case "Entity.findChatRoomMemberByID":
 		if e.complexity.Entity.FindChatRoomMemberByID == nil {
@@ -396,6 +340,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteAccount(childComplexity, args["id"].(string)), true
 
+	case "Mutation.register":
+		if e.complexity.Mutation.Register == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_register_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Register(childComplexity, args["input"].(model.AccountInput)), true
+
 	case "Mutation.updateAccount":
 		if e.complexity.Mutation.UpdateAccount == nil {
 			break
@@ -413,12 +369,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Post_account_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Post.Account(childComplexity, args["_federationRequires"].(map[string]any)), true
+		return e.complexity.Post.Account(childComplexity), true
 
 	case "Post.accountId":
 		if e.complexity.Post.AccountID == nil {
@@ -439,12 +390,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_PostLike_account_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.PostLike.Account(childComplexity, args["_federationRequires"].(map[string]any)), true
+		return e.complexity.PostLike.Account(childComplexity), true
 
 	case "PostLike.accountId":
 		if e.complexity.PostLike.AccountID == nil {
@@ -479,6 +425,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Accounts(childComplexity), true
 
+	case "Query.login":
+		if e.complexity.Query.Login == nil {
+			break
+		}
+
+		args, err := ec.field_Query_login_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Login(childComplexity, args["email"].(string), args["password"].(string)), true
+
 	case "Query._service":
 		if e.complexity.Query.__resolve__service == nil {
 			break
@@ -497,6 +455,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.__resolve_entities(childComplexity, args["representations"].([]map[string]any)), true
+
+	case "Session.accessToken":
+		if e.complexity.Session.AccessToken == nil {
+			break
+		}
+
+		return e.complexity.Session.AccessToken(childComplexity), true
+
+	case "Session.refreshToken":
+		if e.complexity.Session.RefreshToken == nil {
+			break
+		}
+
+		return e.complexity.Session.RefreshToken(childComplexity), true
 
 	case "_Service.sdl":
 		if e.complexity._Service.SDL == nil {
@@ -682,7 +654,6 @@ union _Entity = Account | ChatMessage | ChatRoom | ChatRoomMember | Post | PostL
 type Entity {
 	findAccountByID(id: ID!,): Account!
 	findChatMessageByID(id: ID!,): ChatMessage!
-	findChatRoomByID(id: ID!,): ChatRoom!
 	findChatRoomMemberByID(id: ID!,): ChatRoomMember!
 	findPostByID(id: ID!,): Post!
 	findPostLikeByID(id: ID!,): PostLike!
@@ -703,94 +674,6 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
-
-func (ec *executionContext) field_ChatMessage_account_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_ChatMessage_account_argsFederationRequires(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["_federationRequires"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_ChatMessage_account_argsFederationRequires(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (map[string]any, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("_federationRequires"))
-	directive0 := func(ctx context.Context) (any, error) {
-		tmp, ok := rawArgs["_federationRequires"]
-		if !ok {
-			var zeroVal map[string]any
-			return zeroVal, nil
-		}
-		return ec.unmarshalO_RequiresMap2map(ctx, tmp)
-	}
-
-	directive1 := func(ctx context.Context) (any, error) {
-		return builtInDirectivePopulateFromRepresentations(ctx, rawArgs, directive0)
-	}
-
-	tmp, err := directive1(ctx)
-	if err != nil {
-		var zeroVal map[string]any
-		return zeroVal, graphql.ErrorOnPath(ctx, err)
-	}
-	if data, ok := tmp.(map[string]any); ok {
-		return data, nil
-	} else if tmp == nil {
-		var zeroVal map[string]any
-		return zeroVal, nil
-	} else {
-		var zeroVal map[string]any
-		return zeroVal, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be map[string]any`, tmp))
-	}
-}
-
-func (ec *executionContext) field_ChatRoomMember_account_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_ChatRoomMember_account_argsFederationRequires(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["_federationRequires"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_ChatRoomMember_account_argsFederationRequires(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (map[string]any, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("_federationRequires"))
-	directive0 := func(ctx context.Context) (any, error) {
-		tmp, ok := rawArgs["_federationRequires"]
-		if !ok {
-			var zeroVal map[string]any
-			return zeroVal, nil
-		}
-		return ec.unmarshalO_RequiresMap2map(ctx, tmp)
-	}
-
-	directive1 := func(ctx context.Context) (any, error) {
-		return builtInDirectivePopulateFromRepresentations(ctx, rawArgs, directive0)
-	}
-
-	tmp, err := directive1(ctx)
-	if err != nil {
-		var zeroVal map[string]any
-		return zeroVal, graphql.ErrorOnPath(ctx, err)
-	}
-	if data, ok := tmp.(map[string]any); ok {
-		return data, nil
-	} else if tmp == nil {
-		var zeroVal map[string]any
-		return zeroVal, nil
-	} else {
-		var zeroVal map[string]any
-		return zeroVal, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be map[string]any`, tmp))
-	}
-}
 
 func (ec *executionContext) field_Entity_findAccountByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
@@ -826,29 +709,6 @@ func (ec *executionContext) field_Entity_findChatMessageByID_args(ctx context.Co
 	return args, nil
 }
 func (ec *executionContext) field_Entity_findChatMessageByID_argsID(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (string, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-	if tmp, ok := rawArgs["id"]; ok {
-		return ec.unmarshalNID2string(ctx, tmp)
-	}
-
-	var zeroVal string
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Entity_findChatRoomByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Entity_findChatRoomByID_argsID(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Entity_findChatRoomByID_argsID(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (string, error) {
@@ -976,6 +836,29 @@ func (ec *executionContext) field_Mutation_deleteAccount_argsID(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_register_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_register_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_register_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (model.AccountInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNAccountInput2socialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐAccountInput(ctx, tmp)
+	}
+
+	var zeroVal model.AccountInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_updateAccount_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1015,94 +898,6 @@ func (ec *executionContext) field_Mutation_updateAccount_argsInput(
 
 	var zeroVal model.AccountInput
 	return zeroVal, nil
-}
-
-func (ec *executionContext) field_PostLike_account_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_PostLike_account_argsFederationRequires(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["_federationRequires"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_PostLike_account_argsFederationRequires(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (map[string]any, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("_federationRequires"))
-	directive0 := func(ctx context.Context) (any, error) {
-		tmp, ok := rawArgs["_federationRequires"]
-		if !ok {
-			var zeroVal map[string]any
-			return zeroVal, nil
-		}
-		return ec.unmarshalO_RequiresMap2map(ctx, tmp)
-	}
-
-	directive1 := func(ctx context.Context) (any, error) {
-		return builtInDirectivePopulateFromRepresentations(ctx, rawArgs, directive0)
-	}
-
-	tmp, err := directive1(ctx)
-	if err != nil {
-		var zeroVal map[string]any
-		return zeroVal, graphql.ErrorOnPath(ctx, err)
-	}
-	if data, ok := tmp.(map[string]any); ok {
-		return data, nil
-	} else if tmp == nil {
-		var zeroVal map[string]any
-		return zeroVal, nil
-	} else {
-		var zeroVal map[string]any
-		return zeroVal, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be map[string]any`, tmp))
-	}
-}
-
-func (ec *executionContext) field_Post_account_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Post_account_argsFederationRequires(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["_federationRequires"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Post_account_argsFederationRequires(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (map[string]any, error) {
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("_federationRequires"))
-	directive0 := func(ctx context.Context) (any, error) {
-		tmp, ok := rawArgs["_federationRequires"]
-		if !ok {
-			var zeroVal map[string]any
-			return zeroVal, nil
-		}
-		return ec.unmarshalO_RequiresMap2map(ctx, tmp)
-	}
-
-	directive1 := func(ctx context.Context) (any, error) {
-		return builtInDirectivePopulateFromRepresentations(ctx, rawArgs, directive0)
-	}
-
-	tmp, err := directive1(ctx)
-	if err != nil {
-		var zeroVal map[string]any
-		return zeroVal, graphql.ErrorOnPath(ctx, err)
-	}
-	if data, ok := tmp.(map[string]any); ok {
-		return data, nil
-	} else if tmp == nil {
-		var zeroVal map[string]any
-		return zeroVal, nil
-	} else {
-		var zeroVal map[string]any
-		return zeroVal, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be map[string]any`, tmp))
-	}
 }
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
@@ -1168,6 +963,47 @@ func (ec *executionContext) field_Query_account_argsID(
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 	if tmp, ok := rawArgs["id"]; ok {
 		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_login_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_login_argsEmail(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["email"] = arg0
+	arg1, err := ec.field_Query_login_argsPassword(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["password"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_login_argsEmail(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+	if tmp, ok := rawArgs["email"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_login_argsPassword(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+	if tmp, ok := rawArgs["password"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
 	}
 
 	var zeroVal string
@@ -1684,7 +1520,7 @@ func (ec *executionContext) _ChatMessage_account(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ChatMessage().Account(rctx, obj, fc.Args["_federationRequires"].(map[string]any))
+		return obj.Account, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1701,12 +1537,12 @@ func (ec *executionContext) _ChatMessage_account(ctx context.Context, field grap
 	return ec.marshalNAccount2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐAccount(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ChatMessage_account(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ChatMessage_account(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ChatMessage",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -1726,17 +1562,6 @@ func (ec *executionContext) fieldContext_ChatMessage_account(ctx context.Context
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_ChatMessage_account_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -1887,7 +1712,7 @@ func (ec *executionContext) _ChatRoomMember_account(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ChatRoomMember().Account(rctx, obj, fc.Args["_federationRequires"].(map[string]any))
+		return obj.Account, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1904,12 +1729,12 @@ func (ec *executionContext) _ChatRoomMember_account(ctx context.Context, field g
 	return ec.marshalNAccount2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐAccount(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ChatRoomMember_account(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ChatRoomMember_account(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ChatRoomMember",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -1929,17 +1754,6 @@ func (ec *executionContext) fieldContext_ChatRoomMember_account(ctx context.Cont
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_ChatRoomMember_account_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -2072,65 +1886,6 @@ func (ec *executionContext) fieldContext_Entity_findChatMessageByID(ctx context.
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Entity_findChatMessageByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Entity_findChatRoomByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Entity_findChatRoomByID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Entity().FindChatRoomByID(rctx, fc.Args["id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.ChatRoom)
-	fc.Result = res
-	return ec.marshalNChatRoom2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Entity_findChatRoomByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Entity",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ChatRoom_id(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ChatRoom", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Entity_findChatRoomByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2320,6 +2075,77 @@ func (ec *executionContext) fieldContext_Entity_findPostLikeByID(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Entity_findPostLikeByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_register(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_register(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Register(rctx, fc.Args["input"].(model.AccountInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Account)
+	fc.Result = res
+	return ec.marshalNAccount2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐAccount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_register(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Account_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Account_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Account_email(ctx, field)
+			case "password":
+				return ec.fieldContext_Account_password(ctx, field)
+			case "totalPostLike":
+				return ec.fieldContext_Account_totalPostLike(ctx, field)
+			case "totalChatMessage":
+				return ec.fieldContext_Account_totalChatMessage(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_register_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2641,7 +2467,7 @@ func (ec *executionContext) _Post_account(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Post().Account(rctx, obj, fc.Args["_federationRequires"].(map[string]any))
+		return obj.Account, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2658,12 +2484,12 @@ func (ec *executionContext) _Post_account(ctx context.Context, field graphql.Col
 	return ec.marshalNAccount2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐAccount(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Post_account(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Post_account(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Post",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -2683,17 +2509,6 @@ func (ec *executionContext) fieldContext_Post_account(ctx context.Context, field
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Post_account_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -2800,7 +2615,7 @@ func (ec *executionContext) _PostLike_account(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.PostLike().Account(rctx, obj, fc.Args["_federationRequires"].(map[string]any))
+		return obj.Account, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2817,12 +2632,12 @@ func (ec *executionContext) _PostLike_account(ctx context.Context, field graphql
 	return ec.marshalNAccount2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐAccount(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PostLike_account(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PostLike_account(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PostLike",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -2842,17 +2657,6 @@ func (ec *executionContext) fieldContext_PostLike_account(ctx context.Context, f
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_PostLike_account_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -2979,6 +2783,67 @@ func (ec *executionContext) fieldContext_Query_account(ctx context.Context, fiel
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_account_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_login(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Login(rctx, fc.Args["email"].(string), fc.Args["password"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Session)
+	fc.Result = res
+	return ec.marshalNSession2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐSession(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "accessToken":
+				return ec.fieldContext_Session_accessToken(ctx, field)
+			case "refreshToken":
+				return ec.fieldContext_Session_refreshToken(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Session", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_login_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3214,6 +3079,94 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_accessToken(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_accessToken(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AccessToken, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_accessToken(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_refreshToken(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_refreshToken(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RefreshToken, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_refreshToken(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5248,7 +5201,7 @@ func (ec *executionContext) unmarshalInputAccountInput(ctx context.Context, obj 
 			it.Password = data
 		case "scopes":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scopes"))
-			data, err := ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5401,49 +5354,18 @@ func (ec *executionContext) _ChatMessage(ctx context.Context, sel ast.SelectionS
 		case "id":
 			out.Values[i] = ec._ChatMessage_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "accountId":
 			out.Values[i] = ec._ChatMessage_accountId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "account":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ChatMessage_account(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._ChatMessage_account(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5520,49 +5442,18 @@ func (ec *executionContext) _ChatRoomMember(ctx context.Context, sel ast.Selecti
 		case "id":
 			out.Values[i] = ec._ChatRoomMember_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "accountId":
 			out.Values[i] = ec._ChatRoomMember_accountId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "account":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ChatRoomMember_account(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._ChatRoomMember_account(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5637,28 +5528,6 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 					}
 				}()
 				res = ec._Entity_findChatMessageByID(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "findChatRoomByID":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Entity_findChatRoomByID(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -5779,6 +5648,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "register":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_register(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createAccount":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createAccount(ctx, field)
@@ -5837,49 +5713,18 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._Post_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "accountId":
 			out.Values[i] = ec._Post_accountId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "account":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Post_account(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._Post_account(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5917,49 +5762,18 @@ func (ec *executionContext) _PostLike(ctx context.Context, sel ast.SelectionSet,
 		case "id":
 			out.Values[i] = ec._PostLike_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "accountId":
 			out.Values[i] = ec._PostLike_accountId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "account":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._PostLike_account(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._PostLike_account(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6043,6 +5857,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "login":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_login(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "_entities":
 			field := field
 
@@ -6095,6 +5931,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var sessionImplementors = []string{"Session"}
+
+func (ec *executionContext) _Session(ctx context.Context, sel ast.SelectionSet, obj *model.Session) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, sessionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Session")
+		case "accessToken":
+			out.Values[i] = ec._Session_accessToken(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "refreshToken":
+			out.Values[i] = ec._Session_refreshToken(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6581,20 +6461,6 @@ func (ec *executionContext) marshalNChatMessage2ᚖsocialᚑmediaᚑbackendᚑ1�
 	return ec._ChatMessage(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChatRoom2socialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx context.Context, sel ast.SelectionSet, v model.ChatRoom) graphql.Marshaler {
-	return ec._ChatRoom(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNChatRoom2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx context.Context, sel ast.SelectionSet, v *model.ChatRoom) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ChatRoom(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNChatRoomMember2socialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoomMember(ctx context.Context, sel ast.SelectionSet, v model.ChatRoomMember) graphql.Marshaler {
 	return ec._ChatRoomMember(ctx, sel, &v)
 }
@@ -6680,6 +6546,20 @@ func (ec *executionContext) marshalNPostLike2ᚖsocialᚑmediaᚑbackendᚑ1ᚋi
 		return graphql.Null
 	}
 	return ec._PostLike(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSession2socialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v model.Session) graphql.Marshaler {
+	return ec._Session(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSession2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐSession(ctx context.Context, sel ast.SelectionSet, v *model.Session) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Session(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
@@ -7321,22 +7201,6 @@ func (ec *executionContext) marshalO_Entity2githubᚗcomᚋ99designsᚋgqlgenᚋ
 		return graphql.Null
 	}
 	return ec.__Entity(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalO_RequiresMap2map(ctx context.Context, v any) (map[string]any, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalMap(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalO_RequiresMap2map(ctx context.Context, sel ast.SelectionSet, v map[string]any) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalMap(v)
-	return res
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

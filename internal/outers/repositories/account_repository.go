@@ -89,6 +89,44 @@ func (r *AccountRepository) GetAccountById(id uuid.UUID) (*entities.Account, err
 	return account, nil
 }
 
+func (r *AccountRepository) GetAccountByEmailAndPassword(email, password string) (*entities.Account, error) {
+	query := `
+		SELECT json_build_object(
+			'id', id,
+			'name', name,
+			'email', email,
+			'password', password,
+			'total_post_like', total_post_like,
+			'total_chat_message', total_chat_message,
+		    'scopes', (
+				SELECT COALESCE(json_agg(account_scope.scope) , '[]'::json) 
+				FROM account_scope 
+				WHERE account_scope.account_id = account.id
+		    )
+		)
+		FROM account
+		WHERE email = $1 AND password = $2
+	`
+
+	var jsonData []byte
+	err := r.TwoDatabaseConfig.Connection.QueryRow(query, email, password).Scan(&jsonData)
+	if err != nil {
+		return nil, fmt.Errorf("database query scan failed: %w", err)
+	}
+
+	var account *entities.Account
+	err = json.Unmarshal(jsonData, &account)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling account JSON: %w", err)
+	}
+
+	if account == nil {
+		return nil, fmt.Errorf("account not found")
+	}
+
+	return account, nil
+}
+
 func (r *AccountRepository) GetAccountsByIds(ids []*uuid.UUID) ([]*entities.Account, []error) {
 	query := `
 		SELECT COALESCE(json_agg(json_build_object(

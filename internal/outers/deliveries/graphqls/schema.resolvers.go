@@ -33,6 +33,35 @@ func (r *chatRoomMemberResolver) Account(ctx context.Context, obj *model.ChatRoo
 	return r.Dataloader.AccountDataloader.Load(ctx, accountId)
 }
 
+// Register is the resolver for the register field.
+func (r *mutationResolver) Register(ctx context.Context, input model.AccountInput) (*model.Account, error) {
+	account := &entities.Account{
+		ID:               nil,
+		Name:             input.Name,
+		Email:            input.Email,
+		Password:         input.Password,
+		Scopes:           nil,
+		TotalPostLike:    0,
+		TotalChatMessage: 0,
+	}
+	registeredAccount, err := r.RootContainer.UseCaseContainer.AuthUseCase.Register(account)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &model.Account{
+		ID:               registeredAccount.ID.String(),
+		Name:             registeredAccount.Name,
+		Email:            registeredAccount.Email,
+		Password:         registeredAccount.Password,
+		Scopes:           registeredAccount.Scopes,
+		TotalPostLike:    registeredAccount.TotalPostLike,
+		TotalChatMessage: registeredAccount.TotalChatMessage,
+	}
+
+	return result, nil
+}
+
 // CreateAccount is the resolver for the createAccount field.
 func (r *mutationResolver) CreateAccount(ctx context.Context, input model.AccountInput) (*model.Account, error) {
 	id, err := uuid.NewUUID()
@@ -186,6 +215,21 @@ func (r *queryResolver) Accounts(ctx context.Context) ([]*model.Account, error) 
 // Account is the resolver for the account field.
 func (r *queryResolver) Account(ctx context.Context, id string) (*model.Account, error) {
 	return r.Dataloader.AccountDataloader.Load(ctx, id)
+}
+
+// Login is the resolver for the login field.
+func (r *queryResolver) Login(ctx context.Context, email string, password string) (*model.Session, error) {
+	session, err := r.RootContainer.UseCaseContainer.AuthUseCase.Login(email, password)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &model.Session{
+		AccessToken:  session.AccessToken,
+		RefreshToken: session.RefreshToken,
+	}
+
+	return result, nil
 }
 
 // ChatMessage returns ChatMessageResolver implementation.

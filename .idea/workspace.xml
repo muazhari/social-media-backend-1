@@ -5,14 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71953d37-8715-42c5-b1f9-b5bb73b7f1dd" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/internal/inners/models/value_objects/claim.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/inners/models/value_objects/session.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/inners/use_cases/auth_use_case.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/outers/configs/auth_config.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/outers/container/gateway_container.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.example.env" beforeDir="false" afterPath="$PROJECT_DIR$/.example.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/inners/models/value_objects/response_body.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/models/value_objects/response_body.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/configs/graphql_config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/configs/graphql_config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/configs/two_database_config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/configs/two_database_config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/container/repository_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/repository_container.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/middlewares/transaction_middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/middlewares/transaction_middleware.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/container/config_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/config_container.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/container/root_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/root_container.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/container/use_case_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/use_case_container.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/gateways/one_gateway.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/gateways/auth_gateway.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/entity.resolvers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/entity.resolvers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/federation.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/generated.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/generated.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/model/models_gen.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.graphqls" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.graphqls" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.resolvers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.resolvers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/main_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +66,7 @@
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "git-widget-placeholder": "main",
     "go.import.settings.migrated": "true",
-    "last_opened_file_path": "C:/data/apps/social-media-backend-1/internal/inners/models/entities",
+    "last_opened_file_path": "C:/data/apps/social-media-backend-1/internal/outers/configs",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
@@ -71,11 +83,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\data\apps\social-media-backend-1\internal\inners\models\entities" />
+      <recent name="C:\data\apps\social-media-backend-1\internal\outers\configs" />
       <recent name="C:\data\apps\social-media-backend-1\internal\outers\container" />
+      <recent name="C:\data\apps\social-media-backend-1\internal\inners\models\entities" />
       <recent name="C:\data\apps\social-media-backend-1\internal\outers\deliveries\graphqls" />
       <recent name="C:\data\apps\social-media-backend-1" />
-      <recent name="C:\data\apps\social-media-backend-1\internal\outers\configs" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\data\apps\social-media-backend-1\internal" />

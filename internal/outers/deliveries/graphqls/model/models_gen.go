@@ -18,7 +18,7 @@ type AccountInput struct {
 	Name     string   `json:"name"`
 	Email    string   `json:"email"`
 	Password string   `json:"password"`
-	Scopes   []string `json:"scopes"`
+	Scopes   []string `json:"scopes,omitempty"`
 }
 
 type ChatMessage struct {
@@ -63,4 +63,9 @@ type PostLike struct {
 func (PostLike) IsEntity() {}
 
 type Query struct {
+}
+
+type Session struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }

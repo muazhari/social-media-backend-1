@@ -1,11 +1,8 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
 type Account @key(fields: "id") {
     id: ID!
     name: String!
     email: String!
-    password: String!
+    password: String! @requiresScopes(scopes: [["admin"]])
     totalPostLike: Float!
     totalChatMessage: Float!
     scopes: [String!]!
@@ -39,19 +36,26 @@ type PostLike @key(fields: "id") @extends {
     account: Account! @requires(fields: "accountId")
 }
 
+type Session {
+    accessToken: String!
+    refreshToken: String!
+}
+
 type Query {
     accounts: [Account!]!
     account(id: ID!): Account
+    login(email: String!, password: String!): Session!
 }
 
 input AccountInput {
   name: String!
   email: String!
   password: String!
-  scopes: [String!]!
+  scopes: [String!]
 }
 
 type Mutation {
+    register(input: AccountInput!): Account!
     createAccount(input: AccountInput!): Account!
     updateAccount(id: ID!, input: AccountInput!): Account!
     deleteAccount(id: ID!): Account!

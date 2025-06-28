@@ -9,6 +9,7 @@ type Account struct {
 	Password         string         `json:"password"`
 	TotalPostLike    float64        `json:"total_post_like"`
 	TotalChatMessage float64        `json:"total_chat_message"`
+	Scopes           []string       `json:"scopes"`
 	Messages         []*ChatMessage `json:"messages"`
 	Rooms            []*ChatRoom    `json:"rooms"`
 	Posts            []*Post        `json:"posts"`

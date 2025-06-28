@@ -26,13 +26,17 @@ func (r *AccountRepository) GetAllAccounts() ([]*entities.Account, error) {
 			'email', email,
 			'password', password,
 			'total_post_like', total_post_like,
-			'total_chat_message', total_chat_message
-		)), '[]'::json) as item
+			'total_chat_message', total_chat_message,
+		    'scopes', (
+				SELECT COALESCE(json_agg(account_scope.scope) , '[]'::json) 
+				FROM account_scope 
+				WHERE account_scope.account_id = account.id
+		    ) 
+		)), '[]'::json)
 		FROM account;
 	`
 
 	var jsonData []byte
-
 	err := r.TwoDatabaseConfig.Connection.QueryRow(query).Scan(&jsonData)
 	if err != nil {
 		return nil, fmt.Errorf("database query scan failed: %w", err)
@@ -55,8 +59,13 @@ func (r *AccountRepository) GetAccountById(id uuid.UUID) (*entities.Account, err
 			'email', email,
 			'password', password,
 			'total_post_like', total_post_like,
-			'total_chat_message', total_chat_message
-		) as item
+			'total_chat_message', total_chat_message,
+		    'scopes', (
+				SELECT COALESCE(json_agg(account_scope.scope) , '[]'::json) 
+				FROM account_scope 
+				WHERE account_scope.account_id = account.id
+		    )
+		)
 		FROM account
 		WHERE account.id = $1
 	`
@@ -88,8 +97,13 @@ func (r *AccountRepository) GetAccountsByIds(ids []*uuid.UUID) ([]*entities.Acco
 			'email', email,
 			'password', password,
 			'total_post_like', total_post_like,
-			'total_chat_message', total_chat_message
-		)), '[]'::json) as item
+			'total_chat_message', total_chat_message,
+		    'scopes', (
+				SELECT COALESCE(json_agg(account_scope.scope) , '[]'::json) 
+				FROM account_scope 
+				WHERE account_scope.account_id = account.id
+		    )
+		)), '[]'::json)
 		FROM account
 		WHERE id = ANY($1)
 	`
@@ -114,13 +128,13 @@ func (r *AccountRepository) GetAccountsByIds(ids []*uuid.UUID) ([]*entities.Acco
 }
 
 func (r *AccountRepository) CreateAccount(account *entities.Account) (*entities.Account, error) {
-	query := `
+	query_one := `
 		INSERT INTO account (id, name, email, password, total_post_like, total_chat_message)
 		VALUES ($1, $2, $3, $4, $5, $6)
 	`
 
 	_, err := r.TwoDatabaseConfig.Connection.Exec(
-		query,
+		query_one,
 		account.ID,
 		account.Name,
 		account.Email,
@@ -129,7 +143,21 @@ func (r *AccountRepository) CreateAccount(account *entities.Account) (*entities.
 		account.TotalChatMessage,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("database insert failed: %w", err)
+		return nil, fmt.Errorf("database insert one failed: %w", err)
+	}
+
+	queryTwo := `
+			INSERT INTO account_scope (account_id, scope)
+			SELECT $1, unnest($2::text[])
+		`
+
+	_, err = r.TwoDatabaseConfig.Connection.Exec(
+		queryTwo,
+		account.ID,
+		account.Scopes,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("database insert two failed: %w", err)
 	}
 
 	createdAccount, err := r.GetAccountById(*account.ID)
@@ -141,14 +169,14 @@ func (r *AccountRepository) CreateAccount(account *entities.Account) (*entities.
 }
 
 func (r *AccountRepository) UpdateAccountById(id uuid.UUID, account *entities.Account) (*entities.Account, error) {
-	query := `
+	query_one := `
 		UPDATE account
 		SET name = $1, email = $2, password = $3, total_post_like = $4, total_chat_message = $5
 		WHERE id = $6
 	`
 
 	_, err := r.TwoDatabaseConfig.Connection.Exec(
-		query,
+		query_one,
 		account.Name,
 		account.Email,
 		account.Password,
@@ -157,7 +185,31 @@ func (r *AccountRepository) UpdateAccountById(id uuid.UUID, account *entities.Ac
 		id,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("database update failed: %w", err)
+		return nil, fmt.Errorf("database update one failed: %w", err)
+	}
+
+	queryTwo := `
+		DELETE FROM account_scope
+		WHERE account_id = $1
+	`
+
+	_, err = r.TwoDatabaseConfig.Connection.Exec(queryTwo, id)
+	if err != nil {
+		return nil, fmt.Errorf("database delete two failed: %w", err)
+	}
+
+	queryThree := `
+		INSERT INTO account_scope (account_id, scope)
+		SELECT $1, unnest($2::text[])
+	`
+
+	_, err = r.TwoDatabaseConfig.Connection.Exec(
+		queryThree,
+		id,
+		account.Scopes,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("database insert three failed: %w", err)
 	}
 
 	updatedAccount, err := r.GetAccountById(id)
@@ -169,15 +221,20 @@ func (r *AccountRepository) UpdateAccountById(id uuid.UUID, account *entities.Ac
 }
 
 func (r *AccountRepository) DeleteAccountById(id uuid.UUID) (*entities.Account, error) {
+	foundAccount, err := r.GetAccountById(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve account for deletion: %w", err)
+	}
+
 	query := `
 		DELETE FROM account
 		WHERE id = $1
 	`
 
-	_, err := r.TwoDatabaseConfig.Connection.Exec(query, id)
+	_, err = r.TwoDatabaseConfig.Connection.Exec(query, foundAccount.ID)
 	if err != nil {
 		return nil, fmt.Errorf("database delete failed: %w", err)
 	}
 
-	return nil, nil
+	return foundAccount, nil
 }

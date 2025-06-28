@@ -7,9 +7,10 @@ package graphqls
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"social-media-backend-1/internal/inners/models/entities"
 	"social-media-backend-1/internal/outers/deliveries/graphqls/model"
+
+	"github.com/google/uuid"
 )
 
 // Account is the resolver for the account field.
@@ -44,6 +45,7 @@ func (r *mutationResolver) CreateAccount(ctx context.Context, input model.Accoun
 		Name:             input.Name,
 		Email:            input.Email,
 		Password:         input.Password,
+		Scopes:           input.Scopes,
 		TotalPostLike:    0,
 		TotalChatMessage: 0,
 	}
@@ -58,6 +60,7 @@ func (r *mutationResolver) CreateAccount(ctx context.Context, input model.Accoun
 		Name:             createdAccount.Name,
 		Email:            createdAccount.Email,
 		Password:         createdAccount.Password,
+		Scopes:           createdAccount.Scopes,
 		TotalPostLike:    createdAccount.TotalPostLike,
 		TotalChatMessage: createdAccount.TotalChatMessage,
 	}
@@ -84,6 +87,7 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, id string, input m
 	foundAccount.Name = input.Name
 	foundAccount.Email = input.Email
 	foundAccount.Password = input.Password
+	foundAccount.Scopes = input.Scopes
 	updatedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.UpdateAccountById(convertedId, foundAccount)
 	if err != nil {
 		return nil, err
@@ -94,6 +98,7 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, id string, input m
 		Name:             updatedAccount.Name,
 		Email:            updatedAccount.Email,
 		Password:         updatedAccount.Password,
+		Scopes:           updatedAccount.Scopes,
 		TotalPostLike:    updatedAccount.TotalPostLike,
 		TotalChatMessage: updatedAccount.TotalChatMessage,
 	}
@@ -127,6 +132,7 @@ func (r *mutationResolver) DeleteAccount(ctx context.Context, id string) (*model
 		Name:             deletedAccount.Name,
 		Email:            deletedAccount.Email,
 		Password:         deletedAccount.Password,
+		Scopes:           deletedAccount.Scopes,
 		TotalPostLike:    deletedAccount.TotalPostLike,
 		TotalChatMessage: deletedAccount.TotalChatMessage,
 	}
@@ -168,6 +174,7 @@ func (r *queryResolver) Accounts(ctx context.Context) ([]*model.Account, error) 
 			Name:             foundAccount.Name,
 			Email:            foundAccount.Email,
 			Password:         foundAccount.Password,
+			Scopes:           foundAccount.Scopes,
 			TotalPostLike:    foundAccount.TotalPostLike,
 			TotalChatMessage: foundAccount.TotalChatMessage,
 		})

@@ -8,47 +8,33 @@ type Account @key(fields: "id") {
     password: String!
     totalPostLike: Float!
     totalChatMessage: Float!
-    messages: [ChatMessage] @external
-    rooms: [ChatRoom] @external
-    posts: [Post] @external
-    postLikes: [PostLike] @external
+    scopes: [String!]!
 }
 
 type ChatMessage @key(fields: "id") @extends {
-    id: ID! @external
-    content: String! @external
+    id: ID!
     accountId: ID! @external
     account: Account! @requires(fields: "accountId")
-    room: ChatRoom! @external
 }
 
 type ChatRoomMember @key(fields: "id") @extends {
-    id: ID! @external
+    id: ID!
     accountId: ID! @external
     account: Account! @requires(fields: "accountId")
-    room: ChatRoom! @external
 }
 
 type ChatRoom @key(fields: "id") @extends {
-    id: ID! @external
-    name: String! @external
-    description: String! @external
-    members: [ChatRoomMember] @external
-    messages: [ChatMessage] @external
+    id: ID!
 }
 
 type Post @key(fields: "id") @extends {
-    id: ID! @external
-    title: String! @external
-    content: String! @external
+    id: ID!
     accountId: ID! @external
     account: Account! @requires(fields: "accountId")
-    likes: [PostLike] @external
 }
 
 type PostLike @key(fields: "id") @extends {
-    id: ID! @external
-    post: Post! @external
+    id: ID!
     accountId: ID! @external
     account: Account! @requires(fields: "accountId")
 }
@@ -62,6 +48,7 @@ input AccountInput {
   name: String!
   email: String!
   password: String!
+  scopes: [String!]!
 }
 
 type Mutation {

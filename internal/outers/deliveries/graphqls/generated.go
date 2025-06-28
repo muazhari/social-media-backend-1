@@ -56,12 +56,9 @@ type ComplexityRoot struct {
 	Account struct {
 		Email            func(childComplexity int) int
 		ID               func(childComplexity int) int
-		Messages         func(childComplexity int) int
 		Name             func(childComplexity int) int
 		Password         func(childComplexity int) int
-		PostLikes        func(childComplexity int) int
-		Posts            func(childComplexity int) int
-		Rooms            func(childComplexity int) int
+		Scopes           func(childComplexity int) int
 		TotalChatMessage func(childComplexity int) int
 		TotalPostLike    func(childComplexity int) int
 	}
@@ -69,29 +66,23 @@ type ComplexityRoot struct {
 	ChatMessage struct {
 		Account   func(childComplexity int, federationRequires map[string]any) int
 		AccountID func(childComplexity int) int
-		Content   func(childComplexity int) int
 		ID        func(childComplexity int) int
-		Room      func(childComplexity int) int
 	}
 
 	ChatRoom struct {
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Members     func(childComplexity int) int
-		Messages    func(childComplexity int) int
-		Name        func(childComplexity int) int
+		ID func(childComplexity int) int
 	}
 
 	ChatRoomMember struct {
 		Account   func(childComplexity int, federationRequires map[string]any) int
 		AccountID func(childComplexity int) int
 		ID        func(childComplexity int) int
-		Room      func(childComplexity int) int
 	}
 
 	Entity struct {
 		FindAccountByID        func(childComplexity int, id string) int
 		FindChatMessageByID    func(childComplexity int, id string) int
+		FindChatRoomByID       func(childComplexity int, id string) int
 		FindChatRoomMemberByID func(childComplexity int, id string) int
 		FindPostByID           func(childComplexity int, id string) int
 		FindPostLikeByID       func(childComplexity int, id string) int
@@ -106,17 +97,13 @@ type ComplexityRoot struct {
 	Post struct {
 		Account   func(childComplexity int, federationRequires map[string]any) int
 		AccountID func(childComplexity int) int
-		Content   func(childComplexity int) int
 		ID        func(childComplexity int) int
-		Likes     func(childComplexity int) int
-		Title     func(childComplexity int) int
 	}
 
 	PostLike struct {
 		Account   func(childComplexity int, federationRequires map[string]any) int
 		AccountID func(childComplexity int) int
 		ID        func(childComplexity int) int
-		Post      func(childComplexity int) int
 	}
 
 	Query struct {
@@ -140,6 +127,7 @@ type ChatRoomMemberResolver interface {
 type EntityResolver interface {
 	FindAccountByID(ctx context.Context, id string) (*model.Account, error)
 	FindChatMessageByID(ctx context.Context, id string) (*model.ChatMessage, error)
+	FindChatRoomByID(ctx context.Context, id string) (*model.ChatRoom, error)
 	FindChatRoomMemberByID(ctx context.Context, id string) (*model.ChatRoomMember, error)
 	FindPostByID(ctx context.Context, id string) (*model.Post, error)
 	FindPostLikeByID(ctx context.Context, id string) (*model.PostLike, error)
@@ -218,13 +206,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Account.ID(childComplexity), true
 
-	case "Account.messages":
-		if e.complexity.Account.Messages == nil {
-			break
-		}
-
-		return e.complexity.Account.Messages(childComplexity), true
-
 	case "Account.name":
 		if e.complexity.Account.Name == nil {
 			break
@@ -239,26 +220,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Account.Password(childComplexity), true
 
-	case "Account.postLikes":
-		if e.complexity.Account.PostLikes == nil {
+	case "Account.scopes":
+		if e.complexity.Account.Scopes == nil {
 			break
 		}
 
-		return e.complexity.Account.PostLikes(childComplexity), true
-
-	case "Account.posts":
-		if e.complexity.Account.Posts == nil {
-			break
-		}
-
-		return e.complexity.Account.Posts(childComplexity), true
-
-	case "Account.rooms":
-		if e.complexity.Account.Rooms == nil {
-			break
-		}
-
-		return e.complexity.Account.Rooms(childComplexity), true
+		return e.complexity.Account.Scopes(childComplexity), true
 
 	case "Account.totalChatMessage":
 		if e.complexity.Account.TotalChatMessage == nil {
@@ -293,13 +260,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ChatMessage.AccountID(childComplexity), true
 
-	case "ChatMessage.content":
-		if e.complexity.ChatMessage.Content == nil {
-			break
-		}
-
-		return e.complexity.ChatMessage.Content(childComplexity), true
-
 	case "ChatMessage.id":
 		if e.complexity.ChatMessage.ID == nil {
 			break
@@ -307,47 +267,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ChatMessage.ID(childComplexity), true
 
-	case "ChatMessage.room":
-		if e.complexity.ChatMessage.Room == nil {
-			break
-		}
-
-		return e.complexity.ChatMessage.Room(childComplexity), true
-
-	case "ChatRoom.description":
-		if e.complexity.ChatRoom.Description == nil {
-			break
-		}
-
-		return e.complexity.ChatRoom.Description(childComplexity), true
-
 	case "ChatRoom.id":
 		if e.complexity.ChatRoom.ID == nil {
 			break
 		}
 
 		return e.complexity.ChatRoom.ID(childComplexity), true
-
-	case "ChatRoom.members":
-		if e.complexity.ChatRoom.Members == nil {
-			break
-		}
-
-		return e.complexity.ChatRoom.Members(childComplexity), true
-
-	case "ChatRoom.messages":
-		if e.complexity.ChatRoom.Messages == nil {
-			break
-		}
-
-		return e.complexity.ChatRoom.Messages(childComplexity), true
-
-	case "ChatRoom.name":
-		if e.complexity.ChatRoom.Name == nil {
-			break
-		}
-
-		return e.complexity.ChatRoom.Name(childComplexity), true
 
 	case "ChatRoomMember.account":
 		if e.complexity.ChatRoomMember.Account == nil {
@@ -375,13 +300,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ChatRoomMember.ID(childComplexity), true
 
-	case "ChatRoomMember.room":
-		if e.complexity.ChatRoomMember.Room == nil {
-			break
-		}
-
-		return e.complexity.ChatRoomMember.Room(childComplexity), true
-
 	case "Entity.findAccountByID":
 		if e.complexity.Entity.FindAccountByID == nil {
 			break
@@ -405,6 +323,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.FindChatMessageByID(childComplexity, args["id"].(string)), true
+
+	case "Entity.findChatRoomByID":
+		if e.complexity.Entity.FindChatRoomByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findChatRoomByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindChatRoomByID(childComplexity, args["id"].(string)), true
 
 	case "Entity.findChatRoomMemberByID":
 		if e.complexity.Entity.FindChatRoomMemberByID == nil {
@@ -497,33 +427,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Post.AccountID(childComplexity), true
 
-	case "Post.content":
-		if e.complexity.Post.Content == nil {
-			break
-		}
-
-		return e.complexity.Post.Content(childComplexity), true
-
 	case "Post.id":
 		if e.complexity.Post.ID == nil {
 			break
 		}
 
 		return e.complexity.Post.ID(childComplexity), true
-
-	case "Post.likes":
-		if e.complexity.Post.Likes == nil {
-			break
-		}
-
-		return e.complexity.Post.Likes(childComplexity), true
-
-	case "Post.title":
-		if e.complexity.Post.Title == nil {
-			break
-		}
-
-		return e.complexity.Post.Title(childComplexity), true
 
 	case "PostLike.account":
 		if e.complexity.PostLike.Account == nil {
@@ -550,13 +459,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PostLike.ID(childComplexity), true
-
-	case "PostLike.post":
-		if e.complexity.PostLike.Post == nil {
-			break
-		}
-
-		return e.complexity.PostLike.Post(childComplexity), true
 
 	case "Query.account":
 		if e.complexity.Query.Account == nil {
@@ -780,6 +682,7 @@ union _Entity = Account | ChatMessage | ChatRoom | ChatRoomMember | Post | PostL
 type Entity {
 	findAccountByID(id: ID!,): Account!
 	findChatMessageByID(id: ID!,): ChatMessage!
+	findChatRoomByID(id: ID!,): ChatRoom!
 	findChatRoomMemberByID(id: ID!,): ChatRoomMember!
 	findPostByID(id: ID!,): Post!
 	findPostLikeByID(id: ID!,): PostLike!
@@ -923,6 +826,29 @@ func (ec *executionContext) field_Entity_findChatMessageByID_args(ctx context.Co
 	return args, nil
 }
 func (ec *executionContext) field_Entity_findChatMessageByID_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Entity_findChatRoomByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Entity_findChatRoomByID_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Entity_findChatRoomByID_argsID(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (string, error) {
@@ -1612,8 +1538,8 @@ func (ec *executionContext) fieldContext_Account_totalChatMessage(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Account_messages(ctx context.Context, field graphql.CollectedField, obj *model.Account) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Account_messages(ctx, field)
+func (ec *executionContext) _Account_scopes(ctx context.Context, field graphql.CollectedField, obj *model.Account) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Account_scopes(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1626,199 +1552,31 @@ func (ec *executionContext) _Account_messages(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Messages, nil
+		return obj.Scopes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ChatMessage)
-	fc.Result = res
-	return ec.marshalOChatMessage2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Account_messages(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Account",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ChatMessage_id(ctx, field)
-			case "content":
-				return ec.fieldContext_ChatMessage_content(ctx, field)
-			case "accountId":
-				return ec.fieldContext_ChatMessage_accountId(ctx, field)
-			case "account":
-				return ec.fieldContext_ChatMessage_account(ctx, field)
-			case "room":
-				return ec.fieldContext_ChatMessage_room(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ChatMessage", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Account_rooms(ctx context.Context, field graphql.CollectedField, obj *model.Account) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Account_rooms(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
 		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Rooms, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
 		return graphql.Null
 	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ChatRoom)
+	res := resTmp.([]string)
 	fc.Result = res
-	return ec.marshalOChatRoom2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx, field.Selections, res)
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Account_rooms(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Account_scopes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Account",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ChatRoom_id(ctx, field)
-			case "name":
-				return ec.fieldContext_ChatRoom_name(ctx, field)
-			case "description":
-				return ec.fieldContext_ChatRoom_description(ctx, field)
-			case "members":
-				return ec.fieldContext_ChatRoom_members(ctx, field)
-			case "messages":
-				return ec.fieldContext_ChatRoom_messages(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ChatRoom", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Account_posts(ctx context.Context, field graphql.CollectedField, obj *model.Account) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Account_posts(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Posts, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Post)
-	fc.Result = res
-	return ec.marshalOPost2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPost(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Account_posts(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Account",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Post_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Post_title(ctx, field)
-			case "content":
-				return ec.fieldContext_Post_content(ctx, field)
-			case "accountId":
-				return ec.fieldContext_Post_accountId(ctx, field)
-			case "account":
-				return ec.fieldContext_Post_account(ctx, field)
-			case "likes":
-				return ec.fieldContext_Post_likes(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Account_postLikes(ctx context.Context, field graphql.CollectedField, obj *model.Account) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Account_postLikes(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PostLikes, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.PostLike)
-	fc.Result = res
-	return ec.marshalOPostLike2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPostLike(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Account_postLikes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Account",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_PostLike_id(ctx, field)
-			case "post":
-				return ec.fieldContext_PostLike_post(ctx, field)
-			case "accountId":
-				return ec.fieldContext_PostLike_accountId(ctx, field)
-			case "account":
-				return ec.fieldContext_PostLike_account(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type PostLike", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1863,50 +1621,6 @@ func (ec *executionContext) fieldContext_ChatMessage_id(_ context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ChatMessage_content(ctx context.Context, field graphql.CollectedField, obj *model.ChatMessage) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ChatMessage_content(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Content, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ChatMessage_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ChatMessage",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2007,14 +1721,8 @@ func (ec *executionContext) fieldContext_ChatMessage_account(ctx context.Context
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "messages":
-				return ec.fieldContext_Account_messages(ctx, field)
-			case "rooms":
-				return ec.fieldContext_Account_rooms(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
-			case "postLikes":
-				return ec.fieldContext_Account_postLikes(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -2029,62 +1737,6 @@ func (ec *executionContext) fieldContext_ChatMessage_account(ctx context.Context
 	if fc.Args, err = ec.field_ChatMessage_account_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ChatMessage_room(ctx context.Context, field graphql.CollectedField, obj *model.ChatMessage) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ChatMessage_room(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Room, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.ChatRoom)
-	fc.Result = res
-	return ec.marshalNChatRoom2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ChatMessage_room(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ChatMessage",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ChatRoom_id(ctx, field)
-			case "name":
-				return ec.fieldContext_ChatRoom_name(ctx, field)
-			case "description":
-				return ec.fieldContext_ChatRoom_description(ctx, field)
-			case "members":
-				return ec.fieldContext_ChatRoom_members(ctx, field)
-			case "messages":
-				return ec.fieldContext_ChatRoom_messages(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ChatRoom", field.Name)
-		},
 	}
 	return fc, nil
 }
@@ -2128,198 +1780,6 @@ func (ec *executionContext) fieldContext_ChatRoom_id(_ context.Context, field gr
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ChatRoom_name(ctx context.Context, field graphql.CollectedField, obj *model.ChatRoom) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ChatRoom_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ChatRoom_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ChatRoom",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ChatRoom_description(ctx context.Context, field graphql.CollectedField, obj *model.ChatRoom) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ChatRoom_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ChatRoom_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ChatRoom",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ChatRoom_members(ctx context.Context, field graphql.CollectedField, obj *model.ChatRoom) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ChatRoom_members(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Members, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ChatRoomMember)
-	fc.Result = res
-	return ec.marshalOChatRoomMember2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoomMember(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ChatRoom_members(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ChatRoom",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ChatRoomMember_id(ctx, field)
-			case "accountId":
-				return ec.fieldContext_ChatRoomMember_accountId(ctx, field)
-			case "account":
-				return ec.fieldContext_ChatRoomMember_account(ctx, field)
-			case "room":
-				return ec.fieldContext_ChatRoomMember_room(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ChatRoomMember", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ChatRoom_messages(ctx context.Context, field graphql.CollectedField, obj *model.ChatRoom) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ChatRoom_messages(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Messages, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ChatMessage)
-	fc.Result = res
-	return ec.marshalOChatMessage2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ChatRoom_messages(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ChatRoom",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ChatMessage_id(ctx, field)
-			case "content":
-				return ec.fieldContext_ChatMessage_content(ctx, field)
-			case "accountId":
-				return ec.fieldContext_ChatMessage_accountId(ctx, field)
-			case "account":
-				return ec.fieldContext_ChatMessage_account(ctx, field)
-			case "room":
-				return ec.fieldContext_ChatMessage_room(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ChatMessage", field.Name)
 		},
 	}
 	return fc, nil
@@ -2464,14 +1924,8 @@ func (ec *executionContext) fieldContext_ChatRoomMember_account(ctx context.Cont
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "messages":
-				return ec.fieldContext_Account_messages(ctx, field)
-			case "rooms":
-				return ec.fieldContext_Account_rooms(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
-			case "postLikes":
-				return ec.fieldContext_Account_postLikes(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -2486,62 +1940,6 @@ func (ec *executionContext) fieldContext_ChatRoomMember_account(ctx context.Cont
 	if fc.Args, err = ec.field_ChatRoomMember_account_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ChatRoomMember_room(ctx context.Context, field graphql.CollectedField, obj *model.ChatRoomMember) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ChatRoomMember_room(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Room, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.ChatRoom)
-	fc.Result = res
-	return ec.marshalNChatRoom2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ChatRoomMember_room(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ChatRoomMember",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_ChatRoom_id(ctx, field)
-			case "name":
-				return ec.fieldContext_ChatRoom_name(ctx, field)
-			case "description":
-				return ec.fieldContext_ChatRoom_description(ctx, field)
-			case "members":
-				return ec.fieldContext_ChatRoom_members(ctx, field)
-			case "messages":
-				return ec.fieldContext_ChatRoom_messages(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ChatRoom", field.Name)
-		},
 	}
 	return fc, nil
 }
@@ -2597,14 +1995,8 @@ func (ec *executionContext) fieldContext_Entity_findAccountByID(ctx context.Cont
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "messages":
-				return ec.fieldContext_Account_messages(ctx, field)
-			case "rooms":
-				return ec.fieldContext_Account_rooms(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
-			case "postLikes":
-				return ec.fieldContext_Account_postLikes(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -2664,14 +2056,10 @@ func (ec *executionContext) fieldContext_Entity_findChatMessageByID(ctx context.
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_ChatMessage_id(ctx, field)
-			case "content":
-				return ec.fieldContext_ChatMessage_content(ctx, field)
 			case "accountId":
 				return ec.fieldContext_ChatMessage_accountId(ctx, field)
 			case "account":
 				return ec.fieldContext_ChatMessage_account(ctx, field)
-			case "room":
-				return ec.fieldContext_ChatMessage_room(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ChatMessage", field.Name)
 		},
@@ -2684,6 +2072,65 @@ func (ec *executionContext) fieldContext_Entity_findChatMessageByID(ctx context.
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Entity_findChatMessageByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Entity_findChatRoomByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findChatRoomByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindChatRoomByID(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ChatRoom)
+	fc.Result = res
+	return ec.marshalNChatRoom2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findChatRoomByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ChatRoom_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ChatRoom", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findChatRoomByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2735,8 +2182,6 @@ func (ec *executionContext) fieldContext_Entity_findChatRoomMemberByID(ctx conte
 				return ec.fieldContext_ChatRoomMember_accountId(ctx, field)
 			case "account":
 				return ec.fieldContext_ChatRoomMember_account(ctx, field)
-			case "room":
-				return ec.fieldContext_ChatRoomMember_room(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ChatRoomMember", field.Name)
 		},
@@ -2796,16 +2241,10 @@ func (ec *executionContext) fieldContext_Entity_findPostByID(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Post_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Post_title(ctx, field)
-			case "content":
-				return ec.fieldContext_Post_content(ctx, field)
 			case "accountId":
 				return ec.fieldContext_Post_accountId(ctx, field)
 			case "account":
 				return ec.fieldContext_Post_account(ctx, field)
-			case "likes":
-				return ec.fieldContext_Post_likes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -2865,8 +2304,6 @@ func (ec *executionContext) fieldContext_Entity_findPostLikeByID(ctx context.Con
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_PostLike_id(ctx, field)
-			case "post":
-				return ec.fieldContext_PostLike_post(ctx, field)
 			case "accountId":
 				return ec.fieldContext_PostLike_accountId(ctx, field)
 			case "account":
@@ -2940,14 +2377,8 @@ func (ec *executionContext) fieldContext_Mutation_createAccount(ctx context.Cont
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "messages":
-				return ec.fieldContext_Account_messages(ctx, field)
-			case "rooms":
-				return ec.fieldContext_Account_rooms(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
-			case "postLikes":
-				return ec.fieldContext_Account_postLikes(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3017,14 +2448,8 @@ func (ec *executionContext) fieldContext_Mutation_updateAccount(ctx context.Cont
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "messages":
-				return ec.fieldContext_Account_messages(ctx, field)
-			case "rooms":
-				return ec.fieldContext_Account_rooms(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
-			case "postLikes":
-				return ec.fieldContext_Account_postLikes(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3094,14 +2519,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteAccount(ctx context.Cont
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "messages":
-				return ec.fieldContext_Account_messages(ctx, field)
-			case "rooms":
-				return ec.fieldContext_Account_rooms(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
-			case "postLikes":
-				return ec.fieldContext_Account_postLikes(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3159,94 +2578,6 @@ func (ec *executionContext) fieldContext_Post_id(_ context.Context, field graphq
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Post_title(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Post_title(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Title, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Post_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Post",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Post_content(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Post_content(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Content, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Post_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Post",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3347,14 +2678,8 @@ func (ec *executionContext) fieldContext_Post_account(ctx context.Context, field
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "messages":
-				return ec.fieldContext_Account_messages(ctx, field)
-			case "rooms":
-				return ec.fieldContext_Account_rooms(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
-			case "postLikes":
-				return ec.fieldContext_Account_postLikes(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3369,57 +2694,6 @@ func (ec *executionContext) fieldContext_Post_account(ctx context.Context, field
 	if fc.Args, err = ec.field_Post_account_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Post_likes(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Post_likes(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Likes, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.PostLike)
-	fc.Result = res
-	return ec.marshalOPostLike2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPostLike(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Post_likes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Post",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_PostLike_id(ctx, field)
-			case "post":
-				return ec.fieldContext_PostLike_post(ctx, field)
-			case "accountId":
-				return ec.fieldContext_PostLike_accountId(ctx, field)
-			case "account":
-				return ec.fieldContext_PostLike_account(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type PostLike", field.Name)
-		},
 	}
 	return fc, nil
 }
@@ -3463,64 +2737,6 @@ func (ec *executionContext) fieldContext_PostLike_id(_ context.Context, field gr
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _PostLike_post(ctx context.Context, field graphql.CollectedField, obj *model.PostLike) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PostLike_post(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Post, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Post)
-	fc.Result = res
-	return ec.marshalNPost2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPost(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_PostLike_post(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "PostLike",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Post_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Post_title(ctx, field)
-			case "content":
-				return ec.fieldContext_Post_content(ctx, field)
-			case "accountId":
-				return ec.fieldContext_Post_accountId(ctx, field)
-			case "account":
-				return ec.fieldContext_Post_account(ctx, field)
-			case "likes":
-				return ec.fieldContext_Post_likes(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
 	}
 	return fc, nil
@@ -3621,14 +2837,8 @@ func (ec *executionContext) fieldContext_PostLike_account(ctx context.Context, f
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "messages":
-				return ec.fieldContext_Account_messages(ctx, field)
-			case "rooms":
-				return ec.fieldContext_Account_rooms(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
-			case "postLikes":
-				return ec.fieldContext_Account_postLikes(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3698,14 +2908,8 @@ func (ec *executionContext) fieldContext_Query_accounts(_ context.Context, field
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "messages":
-				return ec.fieldContext_Account_messages(ctx, field)
-			case "rooms":
-				return ec.fieldContext_Account_rooms(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
-			case "postLikes":
-				return ec.fieldContext_Account_postLikes(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -3761,14 +2965,8 @@ func (ec *executionContext) fieldContext_Query_account(ctx context.Context, fiel
 				return ec.fieldContext_Account_totalPostLike(ctx, field)
 			case "totalChatMessage":
 				return ec.fieldContext_Account_totalChatMessage(ctx, field)
-			case "messages":
-				return ec.fieldContext_Account_messages(ctx, field)
-			case "rooms":
-				return ec.fieldContext_Account_rooms(ctx, field)
-			case "posts":
-				return ec.fieldContext_Account_posts(ctx, field)
-			case "postLikes":
-				return ec.fieldContext_Account_postLikes(ctx, field)
+			case "scopes":
+				return ec.fieldContext_Account_scopes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
@@ -6020,7 +5218,7 @@ func (ec *executionContext) unmarshalInputAccountInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "email", "password"}
+	fieldsInOrder := [...]string{"name", "email", "password", "scopes"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6048,6 +5246,13 @@ func (ec *executionContext) unmarshalInputAccountInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.Password = data
+		case "scopes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scopes"))
+			data, err := ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Scopes = data
 		}
 	}
 
@@ -6154,14 +5359,11 @@ func (ec *executionContext) _Account(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "messages":
-			out.Values[i] = ec._Account_messages(ctx, field, obj)
-		case "rooms":
-			out.Values[i] = ec._Account_rooms(ctx, field, obj)
-		case "posts":
-			out.Values[i] = ec._Account_posts(ctx, field, obj)
-		case "postLikes":
-			out.Values[i] = ec._Account_postLikes(ctx, field, obj)
+		case "scopes":
+			out.Values[i] = ec._Account_scopes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6198,11 +5400,6 @@ func (ec *executionContext) _ChatMessage(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = graphql.MarshalString("ChatMessage")
 		case "id":
 			out.Values[i] = ec._ChatMessage_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "content":
-			out.Values[i] = ec._ChatMessage_content(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -6247,11 +5444,6 @@ func (ec *executionContext) _ChatMessage(ctx context.Context, sel ast.SelectionS
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "room":
-			out.Values[i] = ec._ChatMessage_room(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6291,20 +5483,6 @@ func (ec *executionContext) _ChatRoom(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "name":
-			out.Values[i] = ec._ChatRoom_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "description":
-			out.Values[i] = ec._ChatRoom_description(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "members":
-			out.Values[i] = ec._ChatRoom_members(ctx, field, obj)
-		case "messages":
-			out.Values[i] = ec._ChatRoom_messages(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6385,11 +5563,6 @@ func (ec *executionContext) _ChatRoomMember(ctx context.Context, sel ast.Selecti
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "room":
-			out.Values[i] = ec._ChatRoomMember_room(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6464,6 +5637,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 					}
 				}()
 				res = ec._Entity_findChatMessageByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findChatRoomByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findChatRoomByID(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -6644,16 +5839,6 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "title":
-			out.Values[i] = ec._Post_title(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "content":
-			out.Values[i] = ec._Post_content(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "accountId":
 			out.Values[i] = ec._Post_accountId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6695,8 +5880,6 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "likes":
-			out.Values[i] = ec._Post_likes(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6733,11 +5916,6 @@ func (ec *executionContext) _PostLike(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = graphql.MarshalString("PostLike")
 		case "id":
 			out.Values[i] = ec._PostLike_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "post":
-			out.Values[i] = ec._PostLike_post(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -7403,6 +6581,10 @@ func (ec *executionContext) marshalNChatMessage2ᚖsocialᚑmediaᚑbackendᚑ1�
 	return ec._ChatMessage(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNChatRoom2socialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx context.Context, sel ast.SelectionSet, v model.ChatRoom) graphql.Marshaler {
+	return ec._ChatRoom(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNChatRoom2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx context.Context, sel ast.SelectionSet, v *model.ChatRoom) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -7513,6 +6695,36 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalN_Any2map(ctx context.Context, v any) (map[string]any, error) {
@@ -8040,246 +7252,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
-}
-
-func (ec *executionContext) marshalOChatMessage2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatMessage(ctx context.Context, sel ast.SelectionSet, v []*model.ChatMessage) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOChatMessage2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatMessage(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOChatMessage2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatMessage(ctx context.Context, sel ast.SelectionSet, v *model.ChatMessage) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ChatMessage(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOChatRoom2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx context.Context, sel ast.SelectionSet, v []*model.ChatRoom) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOChatRoom2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOChatRoom2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoom(ctx context.Context, sel ast.SelectionSet, v *model.ChatRoom) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ChatRoom(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOChatRoomMember2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoomMember(ctx context.Context, sel ast.SelectionSet, v []*model.ChatRoomMember) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOChatRoomMember2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoomMember(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOChatRoomMember2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐChatRoomMember(ctx context.Context, sel ast.SelectionSet, v *model.ChatRoomMember) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ChatRoomMember(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOPost2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v []*model.Post) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOPost2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPost(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOPost2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Post(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOPostLike2ᚕᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPostLike(ctx context.Context, sel ast.SelectionSet, v []*model.PostLike) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOPostLike2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPostLike(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOPostLike2ᚖsocialᚑmediaᚑbackendᚑ1ᚋinternalᚋoutersᚋdeliveriesᚋgraphqlsᚋmodelᚐPostLike(ctx context.Context, sel ast.SelectionSet, v *model.PostLike) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._PostLike(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v any) (string, error) {

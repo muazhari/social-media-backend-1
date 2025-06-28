@@ -49,6 +49,11 @@ func (r *entityResolver) FindChatMessageByID(ctx context.Context, id string) (*m
 	return result, nil
 }
 
+// FindChatRoomByID is the resolver for the findChatRoomByID field.
+func (r *entityResolver) FindChatRoomByID(ctx context.Context, id string) (*model.ChatRoom, error) {
+	panic(fmt.Errorf("not implemented: FindChatRoomByID - findChatRoomByID"))
+}
+
 // FindChatRoomMemberByID is the resolver for the findChatRoomMemberByID field.
 func (r *entityResolver) FindChatRoomMemberByID(ctx context.Context, id string) (*model.ChatRoomMember, error) {
 	result := &model.ChatRoomMember{

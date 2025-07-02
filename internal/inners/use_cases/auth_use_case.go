@@ -1,7 +1,7 @@
 package use_cases
 
 import (
-	"crypto/ed25519"
+	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"github.com/google/uuid"
@@ -54,14 +54,15 @@ func (uc *AuthUseCase) createToken(claims *value_objects.Claims) (string, error)
 
 	block, _ := pem.Decode([]byte(privateKey))
 	parseResult, _ := x509.ParsePKCS8PrivateKey(block.Bytes)
-	key := parseResult.(ed25519.PrivateKey)
+	key := parseResult.(*rsa.PrivateKey)
 	opts := &jose.SignerOptions{}
 	signer, err := jose.NewSigner(
-		jose.SigningKey{Algorithm: jose.EdDSA, Key: key},
-		opts.WithType("JWT"),
+		jose.SigningKey{Algorithm: jose.RS256, Key: key},
+		opts.WithType("JWT").WithHeader("kid", "social-media-backend-key"),
 	)
 	if err != nil {
 		return "", err
+
 	}
 
 	token, err := jwt.Signed(signer).Claims(claims).CompactSerialize()
@@ -85,7 +86,8 @@ func (uc *AuthUseCase) Login(email string, password string) (*value_objects.Sess
 		IssuedAt: jwt.NewNumericDate(timeNow),
 		Expiry:   jwt.NewNumericDate(timeNow.Add(15 * time.Minute)),
 		Issuer:   "social-media-backend-1",
-		Scopes:   strings.Join(account.Scopes, " "),
+		Scope:    strings.Join(account.Scopes, " "),
+		Audience: &jwt.Audience{"social-media-backend"},
 	}
 	accessToken, err := uc.createToken(accessTokenClaims)
 	if err != nil {
@@ -97,7 +99,8 @@ func (uc *AuthUseCase) Login(email string, password string) (*value_objects.Sess
 		IssuedAt: jwt.NewNumericDate(timeNow),
 		Expiry:   jwt.NewNumericDate(timeNow.Add(24 * time.Hour)),
 		Issuer:   "social-media-backend-1",
-		Scopes:   strings.Join(account.Scopes, " "),
+		Scope:    strings.Join(account.Scopes, " "),
+		Audience: &jwt.Audience{"social-media-backend"},
 	}
 	refreshToken, err := uc.createToken(refreshTokenClaims)
 	if err != nil {

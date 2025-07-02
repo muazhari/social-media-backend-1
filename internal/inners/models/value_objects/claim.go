@@ -8,5 +8,5 @@ type Claims struct {
 	Expiry   *jwt.NumericDate `json:"exp"`
 	Issuer   string           `json:"iss"`
 	Audience *jwt.Audience    `json:"aud"`
-	Scopes   string           `json:"scopes"`
+	Scope    string           `json:"scope"`
 }

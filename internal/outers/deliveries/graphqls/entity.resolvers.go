@@ -49,6 +49,11 @@ func (r *entityResolver) FindChatMessageByID(ctx context.Context, id string) (*m
 	return result, nil
 }
 
+// FindChatRoomByID is the resolver for the findChatRoomByID field.
+func (r *entityResolver) FindChatRoomByID(ctx context.Context, id string) (*model.ChatRoom, error) {
+	panic(fmt.Errorf("not implemented: FindChatRoomByID - findChatRoomByID"))
+}
+
 // FindChatRoomMemberByID is the resolver for the findChatRoomMemberByID field.
 func (r *entityResolver) FindChatRoomMemberByID(ctx context.Context, id string) (*model.ChatRoomMember, error) {
 	result := &model.ChatRoomMember{
@@ -80,15 +85,3 @@ func (r *entityResolver) FindPostLikeByID(ctx context.Context, id string) (*mode
 func (r *Resolver) Entity() EntityResolver { return &entityResolver{r} }
 
 type entityResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *entityResolver) FindChatRoomByID(ctx context.Context, id string) (*model.ChatRoom, error) {
-	panic(fmt.Errorf("not implemented: FindChatRoomByID - findChatRoomByID"))
-}
-*/

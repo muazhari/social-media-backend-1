@@ -14,12 +14,12 @@ import (
 
 // FindAccountByID is the resolver for the findAccountByID field.
 func (r *entityResolver) FindAccountByID(ctx context.Context, id string) (*model.Account, error) {
-	convertedId, err := uuid.Parse(id)
+	convertedID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
 	}
 
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, convertedID)
 	if err != nil {
 		return nil, err
 	}
@@ -30,11 +30,11 @@ func (r *entityResolver) FindAccountByID(ctx context.Context, id string) (*model
 
 	result := &model.Account{
 		ID:               foundAccount.ID.String(),
-		Name:             foundAccount.Name,
-		Email:            foundAccount.Email,
-		Password:         foundAccount.Password,
-		TotalPostLike:    foundAccount.TotalPostLike,
-		TotalChatMessage: foundAccount.TotalChatMessage,
+		Name:             *foundAccount.Name,
+		Email:            *foundAccount.Email,
+		Password:         *foundAccount.Password,
+		TotalPostLike:    *foundAccount.TotalPostLike,
+		TotalChatMessage: *foundAccount.TotalChatMessage,
 	}
 
 	return result, nil

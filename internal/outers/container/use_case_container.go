@@ -7,12 +7,9 @@ type UseCaseContainer struct {
 	AuthUseCase    *use_cases.AuthUseCase
 }
 
-func NewUseCaseContainer(
-	repositoryContainer *RepositoryContainer,
-	gatewayContainer *GatewayContainer,
-) *UseCaseContainer {
+func NewUseCaseContainer(repositoryContainer *RepositoryContainer, gatewayContainer *GatewayContainer) *UseCaseContainer {
 	return &UseCaseContainer{
-		AccountUseCase: use_cases.NewAccountUseCase(repositoryContainer.AccountRepository),
+		AccountUseCase: use_cases.NewAccountUseCase(repositoryContainer.AccountRepository, repositoryContainer.FileRepository),
 		AuthUseCase:    use_cases.NewAuthUseCase(repositoryContainer.AccountRepository, gatewayContainer.AuthGateway),
 	}
 }

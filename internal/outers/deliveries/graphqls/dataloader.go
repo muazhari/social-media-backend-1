@@ -13,7 +13,7 @@ type Dataloader struct {
 func NewDataloader(resolver *Resolver) *Dataloader {
 	return &Dataloader{
 		AccountDataloader: dataloadgen.NewLoader[string, *model.Account](
-			resolver.GetAccountsByIds,
+			resolver.GetAccountsByIDs,
 			dataloadgen.WithWait(10*time.Millisecond),
 		),
 	}

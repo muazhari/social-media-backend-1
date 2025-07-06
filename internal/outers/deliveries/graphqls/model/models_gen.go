@@ -2,8 +2,13 @@
 
 package model
 
+import (
+	"github.com/99designs/gqlgen/graphql"
+)
+
 type Account struct {
 	ID               string   `json:"id"`
+	ImageURL         *string  `json:"imageUrl,omitempty"`
 	Name             string   `json:"name"`
 	Email            string   `json:"email"`
 	Password         string   `json:"password"`
@@ -15,10 +20,11 @@ type Account struct {
 func (Account) IsEntity() {}
 
 type AccountInput struct {
-	Name     string   `json:"name"`
-	Email    string   `json:"email"`
-	Password string   `json:"password"`
-	Scopes   []string `json:"scopes,omitempty"`
+	Image    *graphql.Upload `json:"image,omitempty"`
+	Name     string          `json:"name"`
+	Email    string          `json:"email"`
+	Password string          `json:"password"`
+	Scopes   []string        `json:"scopes,omitempty"`
 }
 
 type ChatMessage struct {

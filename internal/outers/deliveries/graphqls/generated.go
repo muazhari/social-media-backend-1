@@ -56,6 +56,7 @@ type ComplexityRoot struct {
 	Account struct {
 		Email            func(childComplexity int) int
 		ID               func(childComplexity int) int
+		ImageURL         func(childComplexity int) int
 		Name             func(childComplexity int) int
 		Password         func(childComplexity int) int
 		Scopes           func(childComplexity int) int
@@ -214,6 +215,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Account.ID(childComplexity), true
+
+	case "Account.imageUrl":
+		if e.complexity.Account.ImageURL == nil {
+			break
+		}
+
+		return e.complexity.Account.ImageURL(childComplexity), true
 
 	case "Account.name":
 		if e.complexity.Account.Name == nil {
@@ -1429,6 +1437,47 @@ func (ec *executionContext) fieldContext_Account_id(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Account_imageUrl(ctx context.Context, field graphql.CollectedField, obj *model.Account) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Account_imageUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Account_imageUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Account",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Account_name(ctx context.Context, field graphql.CollectedField, obj *model.Account) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Account_name(ctx, field)
 	if err != nil {
@@ -1822,6 +1871,8 @@ func (ec *executionContext) fieldContext_ChatMessage_account(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -2025,6 +2076,8 @@ func (ec *executionContext) fieldContext_ChatRoomMember_account(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -2096,6 +2149,8 @@ func (ec *executionContext) fieldContext_Entity_findAccountByID(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -2478,6 +2533,8 @@ func (ec *executionContext) fieldContext_Mutation_register(ctx context.Context, 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -2549,6 +2606,8 @@ func (ec *executionContext) fieldContext_Mutation_createAccount(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -2620,6 +2679,8 @@ func (ec *executionContext) fieldContext_Mutation_updateAccount(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -2691,6 +2752,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteAccount(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -2850,6 +2913,8 @@ func (ec *executionContext) fieldContext_Post_account(ctx context.Context, field
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -3009,6 +3074,8 @@ func (ec *executionContext) fieldContext_PostLike_account(ctx context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -3080,6 +3147,8 @@ func (ec *executionContext) fieldContext_Query_accounts(_ context.Context, field
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -3137,6 +3206,8 @@ func (ec *executionContext) fieldContext_Query_account(ctx context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Account_id(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Account_imageUrl(ctx, field)
 			case "name":
 				return ec.fieldContext_Account_name(ctx, field)
 			case "email":
@@ -5549,13 +5620,20 @@ func (ec *executionContext) unmarshalInputAccountInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "email", "password", "scopes"}
+	fieldsInOrder := [...]string{"image", "name", "email", "password", "scopes"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "image":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+			data, err := ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Image = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -5665,6 +5743,8 @@ func (ec *executionContext) _Account(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "imageUrl":
+			out.Values[i] = ec._Account_imageUrl(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._Account_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7731,6 +7811,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v any) (*graphql.Upload, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalUpload(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v *graphql.Upload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalUpload(*v)
 	return res
 }
 

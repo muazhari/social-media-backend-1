@@ -1,6 +1,7 @@
 package gateways
 
 import (
+	"context"
 	"encoding/json"
 	"gopkg.in/square/go-jose.v2"
 	"io"
@@ -34,8 +35,18 @@ func (authGateway *AuthGateway) GetJwks() (*jose.JSONWebKeySet, error) {
 	return jwks, nil
 }
 
-func (authGateway *AuthGateway) GetJwksPrivateKey() (string, error) {
-	response, err := http.Get(authGateway.AuthConfig.JwksPrivateKeyUrl)
+func (authGateway *AuthGateway) GetJwksPrivateKey(ctx context.Context) (string, error) {
+	request, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodGet,
+		authGateway.AuthConfig.JwksPrivateKeyUrl,
+		nil,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return "", err
 	}
@@ -49,8 +60,18 @@ func (authGateway *AuthGateway) GetJwksPrivateKey() (string, error) {
 	return string(keyBytes), nil
 }
 
-func (authGateway *AuthGateway) GetJwksPublicKey() (string, error) {
-	response, err := http.Get(authGateway.AuthConfig.JwksPublicKeyUrl)
+func (authGateway *AuthGateway) GetJwksPublicKey(ctx context.Context) (string, error) {
+	request, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodGet,
+		authGateway.AuthConfig.JwksPublicKeyUrl,
+		nil,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return "", err
 	}

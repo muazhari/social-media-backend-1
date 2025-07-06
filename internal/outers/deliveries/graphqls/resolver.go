@@ -24,31 +24,32 @@ func NewResolver(rootContainer *container.RootContainer) *Resolver {
 	return resolver
 }
 
-func (r *Resolver) GetAccountsByIds(ctx context.Context, ids []string) ([]*model.Account, []error) {
-	var convertedIds []*uuid.UUID
+func (r *Resolver) GetAccountsByIDs(ctx context.Context, ids []string) ([]*model.Account, []error) {
+	var convertedIDs []*uuid.UUID
 	for _, id := range ids {
-		convertedId, err := uuid.Parse(id)
+		convertedID, err := uuid.Parse(id)
 		if err != nil {
 			return nil, []error{err}
 		}
-		convertedIds = append(convertedIds, &convertedId)
+		convertedIDs = append(convertedIDs, &convertedID)
 	}
 
-	accounts, err := r.RootContainer.RepositoryContainer.AccountRepository.GetAccountsByIds(convertedIds)
+	foundAccounts, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountsByIDs(ctx, convertedIDs)
 	if err != nil {
-		return nil, err
+		return nil, []error{err}
 	}
 
 	var results []*model.Account
-	for _, account := range accounts {
+	for _, foundAccount := range foundAccounts {
 		result := &model.Account{
-			ID:               account.ID.String(),
-			Name:             account.Name,
-			Email:            account.Email,
-			Password:         account.Password,
-			Scopes:           account.Scopes,
-			TotalPostLike:    account.TotalPostLike,
-			TotalChatMessage: account.TotalChatMessage,
+			ID:               foundAccount.ID.String(),
+			ImageURL:         foundAccount.ImageURL,
+			Name:             *foundAccount.Name,
+			Email:            *foundAccount.Email,
+			Password:         *foundAccount.Password,
+			Scopes:           foundAccount.Scopes,
+			TotalPostLike:    *foundAccount.TotalPostLike,
+			TotalChatMessage: *foundAccount.TotalChatMessage,
 		}
 		results = append(results, result)
 	}

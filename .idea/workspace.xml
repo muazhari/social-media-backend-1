@@ -5,15 +5,39 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71953d37-8715-42c5-b1f9-b5bb73b7f1dd" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/internal/outers/configs/four_datastore_config.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/outers/repositories/file_repository.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.example.env" beforeDir="false" afterPath="$PROJECT_DIR$/.example.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/information_schema.FNRwLQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/information_schema.FNRwLQ.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/pg_catalog.0S1ZNQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/pg_catalog.0S1ZNQ.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/public.abK9xQ.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/tiger.v_CTBg.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/tiger.v_CTBg.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/tiger_data.Kle58w.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/tiger_data.Kle58w.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/topology.b8JJxw.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f838fc2a-cd4e-4fe1-a08d-254f38302aa5/storage_v2/_src_/database/db.fgwAAA/schema/topology.b8JJxw.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/inners/models/value_objects/claim.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/models/value_objects/claim.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/inners/models/entities/account.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/models/entities/account.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/inners/models/value_objects/session.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/models/value_objects/session.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/inners/use_cases/account_use_case.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/use_cases/account_use_case.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/inners/use_cases/auth_use_case.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/use_cases/auth_use_case.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/configs/one_database_config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/configs/one_datastore_config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/configs/two_database_config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/configs/two_datastore_config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/container/config_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/config_container.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/container/middleware_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/middleware_container.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/container/repository_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/repository_container.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/container/use_case_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/use_case_container.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/gateways/auth_gateway.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/gateways/auth_gateway.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/dataloader.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/dataloader.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/entity.resolvers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/entity.resolvers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/federation.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/federation.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/generated.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/generated.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/model/models_gen.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/model/models_gen.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/model/models_gen.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/resolver.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/resolver.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.graphqls" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.graphqls" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.resolvers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.resolvers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/middlewares/transaction_middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/middlewares/transaction_middleware.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +54,9 @@
   <component name="GOROOT" url="file://$PROJECT_DIR$/../../../Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1

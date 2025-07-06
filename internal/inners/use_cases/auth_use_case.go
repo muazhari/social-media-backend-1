@@ -1,6 +1,7 @@
 package use_cases
 
 import (
+	"context"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -30,7 +31,7 @@ func NewAuthUseCase(
 	}
 }
 
-func (uc *AuthUseCase) Register(account *entities.Account) (*entities.Account, error) {
+func (uc *AuthUseCase) Register(ctx context.Context, account *entities.Account) (*entities.Account, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return nil, err
@@ -39,15 +40,15 @@ func (uc *AuthUseCase) Register(account *entities.Account) (*entities.Account, e
 	account.ID = &id
 	account.Scopes = []string{"user"}
 
-	createdAccount, err := uc.AccountRepository.CreateAccount(account)
+	createdAccount, err := uc.AccountRepository.CreateAccount(ctx, account)
 	if err != nil {
 		return nil, err
 	}
 	return createdAccount, nil
 }
 
-func (uc *AuthUseCase) createToken(claims *value_objects.Claims) (string, error) {
-	privateKey, err := uc.AuthGateway.GetJwksPrivateKey()
+func (uc *AuthUseCase) createToken(ctx context.Context, claims *value_objects.Claims) (string, error) {
+	privateKey, err := uc.AuthGateway.GetJwksPrivateKey(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -73,8 +74,8 @@ func (uc *AuthUseCase) createToken(claims *value_objects.Claims) (string, error)
 	return token, nil
 }
 
-func (uc *AuthUseCase) Login(email string, password string) (*value_objects.Session, error) {
-	account, err := uc.AccountRepository.GetAccountByEmailAndPassword(email, password)
+func (uc *AuthUseCase) Login(ctx context.Context, email string, password string) (*value_objects.Session, error) {
+	account, err := uc.AccountRepository.GetAccountByEmailAndPassword(ctx, email, password)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +90,7 @@ func (uc *AuthUseCase) Login(email string, password string) (*value_objects.Sess
 		Scope:    strings.Join(account.Scopes, " "),
 		Audience: &jwt.Audience{"social-media-backend"},
 	}
-	accessToken, err := uc.createToken(accessTokenClaims)
+	accessToken, err := uc.createToken(ctx, accessTokenClaims)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +103,7 @@ func (uc *AuthUseCase) Login(email string, password string) (*value_objects.Sess
 		Scope:    strings.Join(account.Scopes, " "),
 		Audience: &jwt.Audience{"social-media-backend"},
 	}
-	refreshToken, err := uc.createToken(refreshTokenClaims)
+	refreshToken, err := uc.createToken(ctx, refreshTokenClaims)
 	if err != nil {
 		return nil, err
 	}

@@ -1,5 +1,8 @@
+scalar Upload
+
 type Account @key(fields: "id") {
     id: ID!
+    imageUrl: String
     name: String!
     email: String!
     password: String! @requiresScopes(scopes: [["admin"]])
@@ -48,6 +51,7 @@ type Query {
 }
 
 input AccountInput {
+  image: Upload
   name: String!
   email: String!
   password: String!

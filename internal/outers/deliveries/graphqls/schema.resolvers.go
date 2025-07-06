@@ -15,48 +15,49 @@ import (
 
 // Account is the resolver for the account field.
 func (r *chatMessageResolver) Account(ctx context.Context, obj *model.ChatMessage, federationRequires map[string]any) (*model.Account, error) {
-	accountId, ok := federationRequires["accountId"].(string)
+	accountID, ok := federationRequires["accountId"].(string)
 	if !ok {
 		return nil, fmt.Errorf("account id is required")
 	}
 
-	return r.Dataloader.AccountDataloader.Load(ctx, accountId)
+	return r.Dataloader.AccountDataloader.Load(ctx, accountID)
 }
 
 // Account is the resolver for the account field.
 func (r *chatRoomMemberResolver) Account(ctx context.Context, obj *model.ChatRoomMember, federationRequires map[string]any) (*model.Account, error) {
-	accountId, ok := federationRequires["accountId"].(string)
+	accountID, ok := federationRequires["accountId"].(string)
 	if !ok {
 		return nil, fmt.Errorf("account id is required")
 	}
 
-	return r.Dataloader.AccountDataloader.Load(ctx, accountId)
+	return r.Dataloader.AccountDataloader.Load(ctx, accountID)
 }
 
 // Register is the resolver for the register field.
 func (r *mutationResolver) Register(ctx context.Context, input model.AccountInput) (*model.Account, error) {
 	account := &entities.Account{
-		ID:               nil,
-		Name:             input.Name,
-		Email:            input.Email,
-		Password:         input.Password,
-		Scopes:           nil,
-		TotalPostLike:    0,
-		TotalChatMessage: 0,
+		Image:            input.Image,
+		Name:             &input.Name,
+		Email:            &input.Email,
+		Password:         &input.Password,
+		Scopes:           input.Scopes,
+		TotalPostLike:    &[]float64{0}[0],
+		TotalChatMessage: &[]float64{0}[0],
 	}
-	registeredAccount, err := r.RootContainer.UseCaseContainer.AuthUseCase.Register(account)
+	registeredAccount, err := r.RootContainer.UseCaseContainer.AuthUseCase.Register(ctx, account)
 	if err != nil {
 		return nil, err
 	}
 
 	result := &model.Account{
 		ID:               registeredAccount.ID.String(),
-		Name:             registeredAccount.Name,
-		Email:            registeredAccount.Email,
-		Password:         registeredAccount.Password,
+		ImageURL:         registeredAccount.ImageURL,
+		Name:             *registeredAccount.Name,
+		Email:            *registeredAccount.Email,
+		Password:         *registeredAccount.Password,
 		Scopes:           registeredAccount.Scopes,
-		TotalPostLike:    registeredAccount.TotalPostLike,
-		TotalChatMessage: registeredAccount.TotalChatMessage,
+		TotalPostLike:    *registeredAccount.TotalPostLike,
+		TotalChatMessage: *registeredAccount.TotalChatMessage,
 	}
 
 	return result, nil
@@ -71,27 +72,29 @@ func (r *mutationResolver) CreateAccount(ctx context.Context, input model.Accoun
 
 	account := &entities.Account{
 		ID:               &id,
-		Name:             input.Name,
-		Email:            input.Email,
-		Password:         input.Password,
+		Image:            input.Image,
+		Name:             &input.Name,
+		Email:            &input.Email,
+		Password:         &input.Password,
 		Scopes:           input.Scopes,
-		TotalPostLike:    0,
-		TotalChatMessage: 0,
+		TotalPostLike:    &[]float64{0}[0],
+		TotalChatMessage: &[]float64{0}[0],
 	}
 
-	createdAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.CreateAccount(account)
+	createdAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.CreateAccount(ctx, account)
 	if err != nil {
 		return nil, err
 	}
 
 	result := &model.Account{
 		ID:               createdAccount.ID.String(),
-		Name:             createdAccount.Name,
-		Email:            createdAccount.Email,
-		Password:         createdAccount.Password,
+		ImageURL:         createdAccount.ImageURL,
+		Name:             *createdAccount.Name,
+		Email:            *createdAccount.Email,
+		Password:         *createdAccount.Password,
 		Scopes:           createdAccount.Scopes,
-		TotalPostLike:    createdAccount.TotalPostLike,
-		TotalChatMessage: createdAccount.TotalChatMessage,
+		TotalPostLike:    *createdAccount.TotalPostLike,
+		TotalChatMessage: *createdAccount.TotalChatMessage,
 	}
 
 	return result, nil
@@ -99,12 +102,12 @@ func (r *mutationResolver) CreateAccount(ctx context.Context, input model.Accoun
 
 // UpdateAccount is the resolver for the updateAccount field.
 func (r *mutationResolver) UpdateAccount(ctx context.Context, id string, input model.AccountInput) (*model.Account, error) {
-	convertedId, err := uuid.Parse(id)
+	convertedID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
 	}
 
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, convertedID)
 	if err != nil {
 		return nil, err
 	}
@@ -113,23 +116,25 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, id string, input m
 		return nil, fmt.Errorf("account not found")
 	}
 
-	foundAccount.Name = input.Name
-	foundAccount.Email = input.Email
-	foundAccount.Password = input.Password
+	foundAccount.Image = input.Image
+	foundAccount.Name = &input.Name
+	foundAccount.Email = &input.Email
+	foundAccount.Password = &input.Password
 	foundAccount.Scopes = input.Scopes
-	updatedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.UpdateAccountById(convertedId, foundAccount)
+	updatedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.UpdateAccountByID(ctx, convertedID, foundAccount)
 	if err != nil {
 		return nil, err
 	}
 
 	result := &model.Account{
 		ID:               updatedAccount.ID.String(),
-		Name:             updatedAccount.Name,
-		Email:            updatedAccount.Email,
-		Password:         updatedAccount.Password,
+		ImageURL:         updatedAccount.ImageURL,
+		Name:             *updatedAccount.Name,
+		Email:            *updatedAccount.Email,
+		Password:         *updatedAccount.Password,
 		Scopes:           updatedAccount.Scopes,
-		TotalPostLike:    updatedAccount.TotalPostLike,
-		TotalChatMessage: updatedAccount.TotalChatMessage,
+		TotalPostLike:    *updatedAccount.TotalPostLike,
+		TotalChatMessage: *updatedAccount.TotalChatMessage,
 	}
 
 	return result, nil
@@ -137,12 +142,12 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, id string, input m
 
 // DeleteAccount is the resolver for the deleteAccount field.
 func (r *mutationResolver) DeleteAccount(ctx context.Context, id string) (*model.Account, error) {
-	convertedId, err := uuid.Parse(id)
+	convertedID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
 	}
 
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountById(convertedId)
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, convertedID)
 	if err != nil {
 		return nil, err
 	}
@@ -151,19 +156,20 @@ func (r *mutationResolver) DeleteAccount(ctx context.Context, id string) (*model
 		return nil, fmt.Errorf("account not found")
 	}
 
-	deletedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.DeleteAccountById(convertedId)
+	deletedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.DeleteAccountByID(ctx, convertedID)
 	if err != nil {
 		return nil, err
 	}
 
 	result := &model.Account{
 		ID:               deletedAccount.ID.String(),
-		Name:             deletedAccount.Name,
-		Email:            deletedAccount.Email,
-		Password:         deletedAccount.Password,
+		ImageURL:         deletedAccount.ImageURL,
+		Name:             *deletedAccount.Name,
+		Email:            *deletedAccount.Email,
+		Password:         *deletedAccount.Password,
 		Scopes:           deletedAccount.Scopes,
-		TotalPostLike:    deletedAccount.TotalPostLike,
-		TotalChatMessage: deletedAccount.TotalChatMessage,
+		TotalPostLike:    *deletedAccount.TotalPostLike,
+		TotalChatMessage: *deletedAccount.TotalChatMessage,
 	}
 
 	return result, nil
@@ -171,27 +177,27 @@ func (r *mutationResolver) DeleteAccount(ctx context.Context, id string) (*model
 
 // Account is the resolver for the account field.
 func (r *postResolver) Account(ctx context.Context, obj *model.Post, federationRequires map[string]any) (*model.Account, error) {
-	accountId, ok := federationRequires["accountId"].(string)
+	accountID, ok := federationRequires["accountId"].(string)
 	if !ok {
 		return nil, fmt.Errorf("account id is required")
 	}
 
-	return r.Dataloader.AccountDataloader.Load(ctx, accountId)
+	return r.Dataloader.AccountDataloader.Load(ctx, accountID)
 }
 
 // Account is the resolver for the account field.
 func (r *postLikeResolver) Account(ctx context.Context, obj *model.PostLike, federationRequires map[string]any) (*model.Account, error) {
-	accountId, ok := federationRequires["accountId"].(string)
+	accountID, ok := federationRequires["accountId"].(string)
 	if !ok {
 		return nil, fmt.Errorf("account id is required")
 	}
 
-	return r.Dataloader.AccountDataloader.Load(ctx, accountId)
+	return r.Dataloader.AccountDataloader.Load(ctx, accountID)
 }
 
 // Accounts is the resolver for the accounts field.
 func (r *queryResolver) Accounts(ctx context.Context) ([]*model.Account, error) {
-	foundAccounts, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAllAccounts()
+	foundAccounts, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAllAccounts(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -200,12 +206,13 @@ func (r *queryResolver) Accounts(ctx context.Context) ([]*model.Account, error) 
 	for _, foundAccount := range foundAccounts {
 		result = append(result, &model.Account{
 			ID:               foundAccount.ID.String(),
-			Name:             foundAccount.Name,
-			Email:            foundAccount.Email,
-			Password:         foundAccount.Password,
+			ImageURL:         foundAccount.ImageURL,
+			Name:             *foundAccount.Name,
+			Email:            *foundAccount.Email,
+			Password:         *foundAccount.Password,
 			Scopes:           foundAccount.Scopes,
-			TotalPostLike:    foundAccount.TotalPostLike,
-			TotalChatMessage: foundAccount.TotalChatMessage,
+			TotalPostLike:    *foundAccount.TotalPostLike,
+			TotalChatMessage: *foundAccount.TotalChatMessage,
 		})
 	}
 
@@ -219,7 +226,7 @@ func (r *queryResolver) Account(ctx context.Context, id string) (*model.Account,
 
 // Login is the resolver for the login field.
 func (r *queryResolver) Login(ctx context.Context, email string, password string) (*model.Session, error) {
-	session, err := r.RootContainer.UseCaseContainer.AuthUseCase.Login(email, password)
+	session, err := r.RootContainer.UseCaseContainer.AuthUseCase.Login(ctx, email, password)
 	if err != nil {
 		return nil, err
 	}

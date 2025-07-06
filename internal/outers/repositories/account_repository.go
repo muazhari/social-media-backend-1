@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
@@ -9,19 +10,20 @@ import (
 )
 
 type AccountRepository struct {
-	TwoDatabaseConfig *configs.TwoDatabaseConfig
+	TwoDatastoreConfig *configs.TwoDatastoreConfig
 }
 
-func NewAccountRepository(twoDatabaseConfig *configs.TwoDatabaseConfig) *AccountRepository {
+func NewAccountRepository(twoDatabaseConfig *configs.TwoDatastoreConfig) *AccountRepository {
 	return &AccountRepository{
-		TwoDatabaseConfig: twoDatabaseConfig,
+		TwoDatastoreConfig: twoDatabaseConfig,
 	}
 }
 
-func (r *AccountRepository) GetAllAccounts() ([]*entities.Account, error) {
+func (r *AccountRepository) GetAllAccounts(ctx context.Context) ([]*entities.Account, error) {
 	query := `
 		SELECT COALESCE(json_agg(json_build_object(
 			'id', id,
+			'image_id', image_id,
 			'name', name,
 			'email', email,
 			'password', password,
@@ -37,7 +39,7 @@ func (r *AccountRepository) GetAllAccounts() ([]*entities.Account, error) {
 	`
 
 	var jsonData []byte
-	err := r.TwoDatabaseConfig.Connection.QueryRow(query).Scan(&jsonData)
+	err := r.TwoDatastoreConfig.Connection.QueryRowContext(ctx, query).Scan(&jsonData)
 	if err != nil {
 		return nil, fmt.Errorf("database query scan failed: %w", err)
 	}
@@ -51,10 +53,11 @@ func (r *AccountRepository) GetAllAccounts() ([]*entities.Account, error) {
 	return accounts, nil
 }
 
-func (r *AccountRepository) GetAccountById(id uuid.UUID) (*entities.Account, error) {
+func (r *AccountRepository) GetAccountByID(ctx context.Context, id uuid.UUID) (*entities.Account, error) {
 	query := `
 		SELECT json_build_object(
 			'id', id,
+			'image_id', image_id,
 			'name', name,
 			'email', email,
 			'password', password,
@@ -71,7 +74,7 @@ func (r *AccountRepository) GetAccountById(id uuid.UUID) (*entities.Account, err
 	`
 
 	var jsonData []byte
-	err := r.TwoDatabaseConfig.Connection.QueryRow(query, id).Scan(&jsonData)
+	err := r.TwoDatastoreConfig.Connection.QueryRowContext(ctx, query, id).Scan(&jsonData)
 	if err != nil {
 		return nil, fmt.Errorf("database query scan failed: %w", err)
 	}
@@ -89,10 +92,11 @@ func (r *AccountRepository) GetAccountById(id uuid.UUID) (*entities.Account, err
 	return account, nil
 }
 
-func (r *AccountRepository) GetAccountByEmailAndPassword(email, password string) (*entities.Account, error) {
+func (r *AccountRepository) GetAccountByEmailAndPassword(ctx context.Context, email, password string) (*entities.Account, error) {
 	query := `
 		SELECT json_build_object(
 			'id', id,
+			'image_id', image_id,
 			'name', name,
 			'email', email,
 			'password', password,
@@ -109,7 +113,7 @@ func (r *AccountRepository) GetAccountByEmailAndPassword(email, password string)
 	`
 
 	var jsonData []byte
-	err := r.TwoDatabaseConfig.Connection.QueryRow(query, email, password).Scan(&jsonData)
+	err := r.TwoDatastoreConfig.Connection.QueryRowContext(ctx, query, email, password).Scan(&jsonData)
 	if err != nil {
 		return nil, fmt.Errorf("database query scan failed: %w", err)
 	}
@@ -127,10 +131,11 @@ func (r *AccountRepository) GetAccountByEmailAndPassword(email, password string)
 	return account, nil
 }
 
-func (r *AccountRepository) GetAccountsByIds(ids []*uuid.UUID) ([]*entities.Account, []error) {
+func (r *AccountRepository) GetAccountsByIDs(ctx context.Context, ids []*uuid.UUID) ([]*entities.Account, error) {
 	query := `
 		SELECT COALESCE(json_agg(json_build_object(
 			'id', id,
+			'image_id', image_id,
 			'name', name,
 			'email', email,
 			'password', password,
@@ -147,33 +152,31 @@ func (r *AccountRepository) GetAccountsByIds(ids []*uuid.UUID) ([]*entities.Acco
 	`
 
 	var jsonData []byte
-	err := r.TwoDatabaseConfig.Connection.QueryRow(query, ids).Scan(&jsonData)
+	err := r.TwoDatastoreConfig.Connection.QueryRowContext(ctx, query, ids).Scan(&jsonData)
 	if err != nil {
-		return nil, []error{fmt.Errorf("database query scan failed: %w", err)}
+		return nil, fmt.Errorf("database query scan failed: %w", err)
 	}
 
 	var accounts []*entities.Account
 	err = json.Unmarshal(jsonData, &accounts)
 	if err != nil {
-		return nil, []error{fmt.Errorf("error unmarshaling accounts JSON: %w", err)}
-	}
-
-	if len(accounts) == 0 {
-		return nil, []error{fmt.Errorf("accounts not found")}
+		return nil, fmt.Errorf("error unmarshaling accounts JSON: %w", err)
 	}
 
 	return accounts, nil
 }
 
-func (r *AccountRepository) CreateAccount(account *entities.Account) (*entities.Account, error) {
+func (r *AccountRepository) CreateAccount(ctx context.Context, account *entities.Account) (*entities.Account, error) {
 	query_one := `
-		INSERT INTO account (id, name, email, password, total_post_like, total_chat_message)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO account (id, image_id, name, email, password, total_post_like, total_chat_message)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
 
-	_, err := r.TwoDatabaseConfig.Connection.Exec(
+	_, err := r.TwoDatastoreConfig.Connection.ExecContext(
+		ctx,
 		query_one,
 		account.ID,
+		account.ImageID,
 		account.Name,
 		account.Email,
 		account.Password,
@@ -189,7 +192,8 @@ func (r *AccountRepository) CreateAccount(account *entities.Account) (*entities.
 			SELECT $1, unnest($2::text[])
 		`
 
-	_, err = r.TwoDatabaseConfig.Connection.Exec(
+	_, err = r.TwoDatastoreConfig.Connection.ExecContext(
+		ctx,
 		queryTwo,
 		account.ID,
 		account.Scopes,
@@ -198,7 +202,7 @@ func (r *AccountRepository) CreateAccount(account *entities.Account) (*entities.
 		return nil, fmt.Errorf("database insert two failed: %w", err)
 	}
 
-	createdAccount, err := r.GetAccountById(*account.ID)
+	createdAccount, err := r.GetAccountByID(ctx, *account.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve created account: %w", err)
 	}
@@ -206,15 +210,17 @@ func (r *AccountRepository) CreateAccount(account *entities.Account) (*entities.
 	return createdAccount, nil
 }
 
-func (r *AccountRepository) UpdateAccountById(id uuid.UUID, account *entities.Account) (*entities.Account, error) {
+func (r *AccountRepository) UpdateAccountByID(ctx context.Context, id uuid.UUID, account *entities.Account) (*entities.Account, error) {
 	query_one := `
 		UPDATE account
-		SET name = $1, email = $2, password = $3, total_post_like = $4, total_chat_message = $5
-		WHERE id = $6
+		SET image_id = $1, name = $2, email = $3, password = $4, total_post_like = $5, total_chat_message = $6
+		WHERE id = $7
 	`
 
-	_, err := r.TwoDatabaseConfig.Connection.Exec(
+	_, err := r.TwoDatastoreConfig.Connection.ExecContext(
+		ctx,
 		query_one,
+		account.ImageID,
 		account.Name,
 		account.Email,
 		account.Password,
@@ -231,7 +237,7 @@ func (r *AccountRepository) UpdateAccountById(id uuid.UUID, account *entities.Ac
 		WHERE account_id = $1
 	`
 
-	_, err = r.TwoDatabaseConfig.Connection.Exec(queryTwo, id)
+	_, err = r.TwoDatastoreConfig.Connection.ExecContext(ctx, queryTwo, id)
 	if err != nil {
 		return nil, fmt.Errorf("database delete two failed: %w", err)
 	}
@@ -241,7 +247,8 @@ func (r *AccountRepository) UpdateAccountById(id uuid.UUID, account *entities.Ac
 		SELECT $1, unnest($2::text[])
 	`
 
-	_, err = r.TwoDatabaseConfig.Connection.Exec(
+	_, err = r.TwoDatastoreConfig.Connection.ExecContext(
+		ctx,
 		queryThree,
 		id,
 		account.Scopes,
@@ -250,7 +257,7 @@ func (r *AccountRepository) UpdateAccountById(id uuid.UUID, account *entities.Ac
 		return nil, fmt.Errorf("database insert three failed: %w", err)
 	}
 
-	updatedAccount, err := r.GetAccountById(id)
+	updatedAccount, err := r.GetAccountByID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve updated account: %w", err)
 	}
@@ -258,8 +265,8 @@ func (r *AccountRepository) UpdateAccountById(id uuid.UUID, account *entities.Ac
 	return updatedAccount, nil
 }
 
-func (r *AccountRepository) DeleteAccountById(id uuid.UUID) (*entities.Account, error) {
-	foundAccount, err := r.GetAccountById(id)
+func (r *AccountRepository) DeleteAccountByID(ctx context.Context, id uuid.UUID) (*entities.Account, error) {
+	foundAccount, err := r.GetAccountByID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve account for deletion: %w", err)
 	}
@@ -269,7 +276,7 @@ func (r *AccountRepository) DeleteAccountById(id uuid.UUID) (*entities.Account, 
 		WHERE id = $1
 	`
 
-	_, err = r.TwoDatabaseConfig.Connection.Exec(query, foundAccount.ID)
+	_, err = r.TwoDatastoreConfig.Connection.ExecContext(ctx, query, foundAccount.ID)
 	if err != nil {
 		return nil, fmt.Errorf("database delete failed: %w", err)
 	}

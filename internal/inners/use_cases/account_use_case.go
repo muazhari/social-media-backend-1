@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"slices"
 	"social-media-backend-1/internal/inners/models/entities"
 	"social-media-backend-1/internal/outers/repositories"
+	"strings"
 )
 
 type AccountUseCase struct {
@@ -87,7 +87,12 @@ func (uc *AccountUseCase) CreateAccount(ctx context.Context, accountToCreate *en
 }
 
 func (uc *AccountUseCase) UpdateAccountByID(ctx context.Context, id uuid.UUID, accountToUpdate *entities.Account) (*entities.Account, error) {
-	updatedAccount, err := uc.AccountRepository.UpdateAccountByID(ctx, id, accountToUpdate)
+	foundAccount, err := uc.AccountRepository.GetAccountByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = uc.DeleteAccountImage(ctx, foundAccount)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +102,12 @@ func (uc *AccountUseCase) UpdateAccountByID(ctx context.Context, id uuid.UUID, a
 		return nil, err
 	}
 
-	updatedAccount.ImageURL, err = uc.GetAccountImageURL(ctx, accountToUpdate)
+	updatedAccount, err := uc.AccountRepository.UpdateAccountByID(ctx, id, accountToUpdate)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedAccount.ImageURL, err = uc.GetAccountImageURL(ctx, updatedAccount)
 	if err != nil {
 		return nil, err
 	}
@@ -114,28 +124,51 @@ func (uc *AccountUseCase) DeleteAccountByID(ctx context.Context, id uuid.UUID) (
 	return deletedAccount, nil
 }
 
+func (uc *AccountUseCase) DeleteAccountImage(ctx context.Context, account *entities.Account) error {
+	if account.ImageID == nil {
+		return nil
+	}
+
+	bucketName := "social-media-backend.account"
+	objectName := account.ImageID.String()
+
+	err := uc.FileRepository.Delete(ctx, bucketName, objectName)
+	if err != nil {
+		return fmt.Errorf("failed to delete account image: %w", err)
+	}
+
+	return nil
+}
+
 func (uc *AccountUseCase) UploadAccountImage(ctx context.Context, account *entities.Account) error {
 	if account.Image == nil {
 		return nil
 	}
 
-	bucketName := "social-media-backend/account"
-	objectName := account.ImageID.String()
+	imageID, err := uuid.NewUUID()
+	if err != nil {
+		return err
+	}
+	account.ImageID = &imageID
+
 	file := account.Image.File
 	fileSize := account.Image.Size
-	fileContentType := account.Image.ContentType
-
-	allowedContentTypes := []string{
-		"image/jpeg",
-		"image/png",
+	fileExtension := strings.SplitN(account.Image.Filename, ".", 2)[1]
+	bucketName := "social-media-backend.account"
+	objectName := imageID.String()
+	extensionToContentType := map[string]string{
+		"jpg":  "image/jpeg",
+		"jpeg": "image/jpeg",
+		"png":  "image/png",
 	}
-	if slices.Contains(allowedContentTypes, fileContentType) == false {
-		return fmt.Errorf("invalid content type: %s", fileContentType)
+	fileContentType, exists := extensionToContentType[fileExtension]
+	if !exists {
+		return fmt.Errorf("unsupported file extension: %s", fileExtension)
 	}
 
-	err := uc.FileRepository.Upload(ctx, bucketName, objectName, file, fileSize, fileContentType)
+	err = uc.FileRepository.Upload(ctx, bucketName, objectName, file, fileSize, fileContentType)
 	if err != nil {
-		return fmt.Errorf("failed to upload account image: %w", err)
+		return err
 	}
 
 	return nil
@@ -146,7 +179,7 @@ func (uc *AccountUseCase) GetAccountImageURL(ctx context.Context, account *entit
 		return nil, nil
 	}
 
-	bucketName := "social-media-backend/account"
+	bucketName := "social-media-backend.account"
 	objectName := account.ImageID.String()
 
 	imageURL, err := uc.FileRepository.GetURL(ctx, bucketName, objectName)

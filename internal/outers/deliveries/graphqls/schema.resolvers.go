@@ -33,16 +33,39 @@ func (r *chatRoomMemberResolver) Account(ctx context.Context, obj *model.ChatRoo
 	return r.Dataloader.AccountDataloader.Load(ctx, accountID)
 }
 
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.Session, error) {
+	session, err := r.RootContainer.UseCaseContainer.AuthUseCase.Login(ctx, input.Email, input.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	account := &model.Account{
+		ID:               session.Account.ID.String(),
+		ImageURL:         session.Account.ImageURL,
+		Name:             *session.Account.Name,
+		Email:            *session.Account.Email,
+		Password:         *session.Account.Password,
+		Scopes:           session.Account.Scopes,
+		TotalPostLike:    *session.Account.TotalPostLike,
+		TotalChatMessage: *session.Account.TotalChatMessage,
+	}
+
+	result := &model.Session{
+		Account:      account,
+		AccessToken:  session.AccessToken,
+		RefreshToken: session.RefreshToken,
+	}
+
+	return result, nil
+}
+
 // Register is the resolver for the register field.
-func (r *mutationResolver) Register(ctx context.Context, input model.AccountInput) (*model.Account, error) {
+func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.Account, error) {
 	account := &entities.Account{
-		Image:            input.Image,
-		Name:             &input.Name,
-		Email:            &input.Email,
-		Password:         &input.Password,
-		Scopes:           input.Scopes,
-		TotalPostLike:    &[]float64{0}[0],
-		TotalChatMessage: &[]float64{0}[0],
+		Name:     &input.Name,
+		Email:    &input.Email,
+		Password: &input.Password,
 	}
 	registeredAccount, err := r.RootContainer.UseCaseContainer.AuthUseCase.Register(ctx, account)
 	if err != nil {
@@ -222,21 +245,6 @@ func (r *queryResolver) Accounts(ctx context.Context) ([]*model.Account, error) 
 // Account is the resolver for the account field.
 func (r *queryResolver) Account(ctx context.Context, id string) (*model.Account, error) {
 	return r.Dataloader.AccountDataloader.Load(ctx, id)
-}
-
-// Login is the resolver for the login field.
-func (r *queryResolver) Login(ctx context.Context, email string, password string) (*model.Session, error) {
-	session, err := r.RootContainer.UseCaseContainer.AuthUseCase.Login(ctx, email, password)
-	if err != nil {
-		return nil, err
-	}
-
-	result := &model.Session{
-		AccessToken:  session.AccessToken,
-		RefreshToken: session.RefreshToken,
-	}
-
-	return result, nil
 }
 
 // ChatMessage returns ChatMessageResolver implementation.

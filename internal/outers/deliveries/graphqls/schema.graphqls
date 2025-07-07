@@ -40,6 +40,7 @@ type PostLike @key(fields: "id") @extends {
 }
 
 type Session {
+    account: Account!
     accessToken: String!
     refreshToken: String!
 }
@@ -47,7 +48,6 @@ type Session {
 type Query {
     accounts: [Account!]!
     account(id: ID!): Account
-    login(email: String!, password: String!): Session!
 }
 
 input AccountInput {
@@ -58,8 +58,20 @@ input AccountInput {
   scopes: [String!]
 }
 
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+input RegisterInput {
+    name: String!
+    email: String!
+    password: String!
+}
+
 type Mutation {
-    register(input: AccountInput!): Account!
+    login(input: LoginInput!): Session!
+    register(input: RegisterInput!): Account!
     createAccount(input: AccountInput!): Account!
     updateAccount(id: ID!, input: AccountInput!): Account!
     deleteAccount(id: ID!): Account!

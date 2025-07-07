@@ -39,6 +39,8 @@ func (uc *AuthUseCase) Register(ctx context.Context, account *entities.Account) 
 
 	account.ID = &id
 	account.Scopes = []string{"user"}
+	account.TotalPostLike = &[]float64{0}[0]
+	account.TotalChatMessage = &[]float64{0}[0]
 
 	createdAccount, err := uc.AccountRepository.CreateAccount(ctx, account)
 	if err != nil {
@@ -75,7 +77,7 @@ func (uc *AuthUseCase) createToken(ctx context.Context, claims *value_objects.Cl
 }
 
 func (uc *AuthUseCase) Login(ctx context.Context, email string, password string) (*value_objects.Session, error) {
-	account, err := uc.AccountRepository.GetAccountByEmailAndPassword(ctx, email, password)
+	foundAccount, err := uc.AccountRepository.GetAccountByEmailAndPassword(ctx, email, password)
 	if err != nil {
 		return nil, err
 	}
@@ -83,11 +85,11 @@ func (uc *AuthUseCase) Login(ctx context.Context, email string, password string)
 	timeNow := time.Now()
 
 	accessTokenClaims := &value_objects.Claims{
-		Subject:  account.ID.String(),
+		Subject:  foundAccount.ID.String(),
 		IssuedAt: jwt.NewNumericDate(timeNow),
 		Expiry:   jwt.NewNumericDate(timeNow.Add(15 * time.Minute)),
 		Issuer:   "social-media-backend-1",
-		Scope:    strings.Join(account.Scopes, " "),
+		Scope:    strings.Join(foundAccount.Scopes, " "),
 		Audience: &jwt.Audience{"social-media-backend"},
 	}
 	accessToken, err := uc.createToken(ctx, accessTokenClaims)
@@ -96,11 +98,11 @@ func (uc *AuthUseCase) Login(ctx context.Context, email string, password string)
 	}
 
 	refreshTokenClaims := &value_objects.Claims{
-		Subject:  account.ID.String(),
+		Subject:  foundAccount.ID.String(),
 		IssuedAt: jwt.NewNumericDate(timeNow),
 		Expiry:   jwt.NewNumericDate(timeNow.Add(24 * time.Hour)),
 		Issuer:   "social-media-backend-1",
-		Scope:    strings.Join(account.Scopes, " "),
+		Scope:    strings.Join(foundAccount.Scopes, " "),
 		Audience: &jwt.Audience{"social-media-backend"},
 	}
 	refreshToken, err := uc.createToken(ctx, refreshTokenClaims)
@@ -109,6 +111,7 @@ func (uc *AuthUseCase) Login(ctx context.Context, email string, password string)
 	}
 
 	session := &value_objects.Session{
+		Account:      foundAccount,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}

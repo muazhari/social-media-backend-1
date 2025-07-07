@@ -49,6 +49,11 @@ type ChatRoomMember struct {
 
 func (ChatRoomMember) IsEntity() {}
 
+type LoginInput struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type Mutation struct {
 }
 
@@ -71,7 +76,14 @@ func (PostLike) IsEntity() {}
 type Query struct {
 }
 
+type RegisterInput struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type Session struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	Account      *Account `json:"account"`
+	AccessToken  string   `json:"accessToken"`
+	RefreshToken string   `json:"refreshToken"`
 }

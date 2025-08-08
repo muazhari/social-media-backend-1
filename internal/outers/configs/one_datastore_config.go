@@ -3,8 +3,9 @@ package configs
 import (
 	"context"
 	"fmt"
-	"github.com/redis/go-redis/v9"
 	"os"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type OneDatastoreConfig struct {

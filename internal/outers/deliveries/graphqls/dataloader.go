@@ -1,9 +1,10 @@
 package graphqls
 
 import (
-	"github.com/vikstrous/dataloadgen"
 	"social-media-backend-1/internal/outers/deliveries/graphqls/model"
 	"time"
+
+	"github.com/vikstrous/dataloadgen"
 )
 
 type Dataloader struct {

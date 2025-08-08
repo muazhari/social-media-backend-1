@@ -2,11 +2,12 @@ package repositories
 
 import (
 	"context"
-	"github.com/minio/minio-go/v7"
 	"io"
 	"net/url"
 	"social-media-backend-1/internal/outers/configs"
 	"time"
+
+	"github.com/minio/minio-go/v7"
 )
 
 type FileRepository struct {

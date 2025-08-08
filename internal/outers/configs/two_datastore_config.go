@@ -3,8 +3,9 @@ package configs
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"os"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 type TwoDatastoreConfig struct {

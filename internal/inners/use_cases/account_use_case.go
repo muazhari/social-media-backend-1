@@ -3,10 +3,11 @@ package use_cases
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"social-media-backend-1/internal/inners/models/entities"
 	"social-media-backend-1/internal/outers/repositories"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 type AccountUseCase struct {

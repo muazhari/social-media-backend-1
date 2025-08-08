@@ -2,9 +2,10 @@ package graphqls
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"social-media-backend-1/internal/outers/container"
 	"social-media-backend-1/internal/outers/deliveries/graphqls/model"
+
+	"github.com/google/uuid"
 )
 
 // This file will not be regenerated automatically.

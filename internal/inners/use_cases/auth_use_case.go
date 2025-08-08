@@ -5,15 +5,16 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"github.com/google/uuid"
-	"gopkg.in/square/go-jose.v2"
-	"gopkg.in/square/go-jose.v2/jwt"
 	"social-media-backend-1/internal/inners/models/entities"
 	"social-media-backend-1/internal/inners/models/value_objects"
 	"social-media-backend-1/internal/outers/deliveries/gateways"
 	"social-media-backend-1/internal/outers/repositories"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+	"gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2/jwt"
 )
 
 type AuthUseCase struct {

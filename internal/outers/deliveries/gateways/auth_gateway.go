@@ -3,10 +3,11 @@ package gateways
 import (
 	"context"
 	"encoding/json"
-	"gopkg.in/square/go-jose.v2"
 	"io"
 	"net/http"
 	"social-media-backend-1/internal/outers/configs"
+
+	"gopkg.in/square/go-jose.v2"
 )
 
 type AuthGateway struct {

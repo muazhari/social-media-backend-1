@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/99designs/gqlgen/graphql/playground"
-	_ "github.com/urfave/cli/v2"
 	"log"
 	"net/http"
 	"os"
 	"social-media-backend-1/internal/outers/container"
 	"social-media-backend-1/internal/outers/deliveries/graphqls"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/99designs/gqlgen/graphql/playground"
 )
 
 func main() {

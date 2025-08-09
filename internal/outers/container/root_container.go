@@ -13,7 +13,7 @@ func NewRootContainer() *RootContainer {
 	repositoryContainer := NewRepositoryContainer(configContainer)
 	gatewayContainer := NewGatewayContainer(configContainer)
 	useCaseContainer := NewUseCaseContainer(repositoryContainer, gatewayContainer)
-	middlewareContainer := NewMiddlewareContainer(useCaseContainer, repositoryContainer)
+	middlewareContainer := NewMiddlewareContainer(configContainer, useCaseContainer, repositoryContainer)
 
 	return &RootContainer{
 		ConfigContainer:     configContainer,

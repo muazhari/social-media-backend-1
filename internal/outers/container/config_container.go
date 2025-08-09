@@ -6,6 +6,7 @@ type ConfigContainer struct {
 	OneDatastoreConfig  *configs.OneDatastoreConfig
 	TwoDatastoreConfig  *configs.TwoDatastoreConfig
 	FourDatastoreConfig *configs.FourDatastoreConfig
+	FiveDatastoreConfig *configs.FiveDatastoreConfig
 	AuthConfig          *configs.AuthConfig
 }
 
@@ -14,6 +15,7 @@ func NewConfigContainer() *ConfigContainer {
 		OneDatastoreConfig:  configs.NewOneDatastoreConfig(),
 		TwoDatastoreConfig:  configs.NewTwoDatastoreConfig(),
 		FourDatastoreConfig: configs.NewFourDatastoreConfig(),
+		FiveDatastoreConfig: configs.NewFiveDatastoreConfig(),
 		AuthConfig:          configs.NewAuthConfig(),
 	}
 }

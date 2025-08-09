@@ -284,3 +284,42 @@ func (r *AccountRepository) DeleteAccountByID(ctx context.Context, id uuid.UUID)
 
 	return foundAccount, nil
 }
+
+func (r *AccountRepository) IncrementTotalPostLike(ctx context.Context, accountID uuid.UUID, delta float64) error {
+	query := `
+		UPDATE account
+		SET total_post_like = COALESCE(total_post_like, 0) + $1
+		WHERE id = $2::uuid
+	`
+	_, err := r.TwoDatastoreConfig.Connection.ExecContext(ctx, query, delta, accountID)
+	if err != nil {
+		return fmt.Errorf("database update total_post_like failed: %w", err)
+	}
+	return nil
+}
+
+func (r *AccountRepository) DecrementTotalPostLike(ctx context.Context, accountID uuid.UUID, delta float64) error {
+	query := `
+		UPDATE account
+		SET total_post_like = COALESCE(total_post_like, 0) - $1
+		WHERE id = $2::uuid
+	`
+	_, err := r.TwoDatastoreConfig.Connection.ExecContext(ctx, query, delta, accountID)
+	if err != nil {
+		return fmt.Errorf("database update total_post_like failed: %w", err)
+	}
+	return nil
+}
+
+func (r *AccountRepository) IncrementTotalChatMessage(ctx context.Context, accountID uuid.UUID, delta float64) error {
+	query := `
+		UPDATE account
+		SET total_chat_message = COALESCE(total_chat_message, 0) + $1
+		WHERE id = $2::uuid
+	`
+	_, err := r.TwoDatastoreConfig.Connection.ExecContext(ctx, query, delta, accountID)
+	if err != nil {
+		return fmt.Errorf("database update total_chat_message failed: %w", err)
+	}
+	return nil
+}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +18,7 @@ func main() {
 	port := os.Getenv("BACKEND_1_PORT")
 
 	rootContainer := container.NewRootContainer()
+	go rootContainer.MiddlewareContainer.KafkaConsumer.Start(context.Background())
 
 	resolver := graphqls.NewResolver(rootContainer)
 	srv := handler.New(graphqls.NewExecutableSchema(graphqls.Config{Resolvers: resolver}))

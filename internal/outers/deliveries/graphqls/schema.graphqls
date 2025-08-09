@@ -72,7 +72,8 @@ input RegisterInput {
 type Mutation {
     login(input: LoginInput!): Session!
     register(input: RegisterInput!): Account!
-    createAccount(input: AccountInput!): Account!
-    updateAccount(id: ID!, input: AccountInput!): Account!
-    deleteAccount(id: ID!): Account!
+    createAccount(input: AccountInput!): Account! @requiresScopes(scopes: [["admin"]])
+    updateAccount(id: ID!, input: AccountInput!): Account! @requiresScopes(scopes: [["admin"]])
+    updateMyAccount(input: AccountInput!): Account! @authenticated
+    deleteAccount(id: ID!): Account! @requiresScopes(scopes: [["admin"]])
 }

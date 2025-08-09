@@ -20,8 +20,18 @@ func NewAuthGateway(authConfig *configs.AuthConfig) *AuthGateway {
 	}
 }
 
-func (authGateway *AuthGateway) GetJwks() (*jose.JSONWebKeySet, error) {
-	response, err := http.Get(authGateway.AuthConfig.JwksUrl)
+func (authGateway *AuthGateway) GetJwks(ctx context.Context) (*jose.JSONWebKeySet, error) {
+	request, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodGet,
+		authGateway.AuthConfig.JwksUrl,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return nil, err
 	}

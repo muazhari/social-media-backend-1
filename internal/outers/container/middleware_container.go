@@ -5,11 +5,16 @@ import (
 )
 
 type MiddlewareContainer struct {
+	AuthMiddleware        *middlewares.AuthMiddleware
 	TransactionMiddleware *middlewares.TransactionMiddleware
 }
 
-func NewMiddlewareContainer(repositoryContainer *RepositoryContainer) *MiddlewareContainer {
+func NewMiddlewareContainer(
+	useCaseContainer *UseCaseContainer,
+	repositoryContainer *RepositoryContainer,
+) *MiddlewareContainer {
 	return &MiddlewareContainer{
+		AuthMiddleware:        middlewares.NewAuthMiddleware(useCaseContainer.AuthUseCase),
 		TransactionMiddleware: middlewares.NewTransactionMiddleware(repositoryContainer.AccountRepository),
 	}
 }

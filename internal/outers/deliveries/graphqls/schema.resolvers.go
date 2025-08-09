@@ -7,8 +7,11 @@ package graphqls
 import (
 	"context"
 	"fmt"
+	"slices"
 	"social-media-backend-1/internal/inners/models/entities"
 	"social-media-backend-1/internal/outers/deliveries/graphqls/model"
+	"social-media-backend-1/internal/outers/deliveries/middlewares"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -88,6 +91,16 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 
 // CreateAccount is the resolver for the createAccount field.
 func (r *mutationResolver) CreateAccount(ctx context.Context, input model.AccountInput) (*model.Account, error) {
+	claims := middlewares.GetClaimContext(ctx)
+	if claims == nil {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	scopes := strings.Split(claims.Scope, " ")
+	if !slices.Contains(scopes, "admin") {
+		return nil, fmt.Errorf("unauthorized: admin scope required")
+	}
+
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return nil, err
@@ -125,7 +138,62 @@ func (r *mutationResolver) CreateAccount(ctx context.Context, input model.Accoun
 
 // UpdateAccount is the resolver for the updateAccount field.
 func (r *mutationResolver) UpdateAccount(ctx context.Context, id string, input model.AccountInput) (*model.Account, error) {
+	claims := middlewares.GetClaimContext(ctx)
+	if claims == nil {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	scopes := strings.Split(claims.Scope, " ")
+	if !slices.Contains(scopes, "admin") {
+		return nil, fmt.Errorf("unauthorized: admin scope required")
+	}
+
 	convertedID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, convertedID)
+	if err != nil {
+		return nil, err
+	}
+
+	if foundAccount == nil {
+		return nil, fmt.Errorf("account not found")
+	}
+
+	foundAccount.Image = input.Image
+	foundAccount.Name = &input.Name
+	foundAccount.Email = &input.Email
+	foundAccount.Password = &input.Password
+	foundAccount.Scopes = input.Scopes
+	updatedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.UpdateAccountByID(ctx, convertedID, foundAccount)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &model.Account{
+		ID:               updatedAccount.ID.String(),
+		ImageURL:         updatedAccount.ImageURL,
+		Name:             *updatedAccount.Name,
+		Email:            *updatedAccount.Email,
+		Password:         *updatedAccount.Password,
+		Scopes:           updatedAccount.Scopes,
+		TotalPostLike:    *updatedAccount.TotalPostLike,
+		TotalChatMessage: *updatedAccount.TotalChatMessage,
+	}
+
+	return result, nil
+}
+
+// UpdateMyAccount is the resolver for the updateMyAccount field.
+func (r *mutationResolver) UpdateMyAccount(ctx context.Context, input model.AccountInput) (*model.Account, error) {
+	claims := middlewares.GetClaimContext(ctx)
+	if claims == nil {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	convertedID, err := uuid.Parse(claims.Subject)
 	if err != nil {
 		return nil, err
 	}
@@ -165,6 +233,16 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, id string, input m
 
 // DeleteAccount is the resolver for the deleteAccount field.
 func (r *mutationResolver) DeleteAccount(ctx context.Context, id string) (*model.Account, error) {
+	claims := middlewares.GetClaimContext(ctx)
+	if claims == nil {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	scopes := strings.Split(claims.Scope, " ")
+	if !slices.Contains(scopes, "admin") {
+		return nil, fmt.Errorf("unauthorized: admin scope required")
+	}
+
 	convertedID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err

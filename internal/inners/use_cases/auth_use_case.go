@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"social-media-backend-1/internal/inners/models/entities"
 	"social-media-backend-1/internal/inners/models/value_objects"
 	"social-media-backend-1/internal/outers/deliveries/gateways"
@@ -75,6 +76,38 @@ func (uc *AuthUseCase) createToken(ctx context.Context, claims *value_objects.Cl
 	}
 
 	return token, nil
+}
+
+func (uc *AuthUseCase) VerifyToken(ctx context.Context, tokenString string) (*value_objects.Claims, error) {
+	jwks, err := uc.AuthGateway.GetJwks(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := jwt.ParseSigned(tokenString)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(token.Headers) == 0 {
+		return nil, fmt.Errorf("token has no headers")
+	}
+	kid := token.Headers[0].KeyID
+
+	keys := jwks.Key(kid)
+	if len(keys) == 0 {
+		return nil, fmt.Errorf("public key not found for token with kid: %s", kid)
+	}
+
+	publicKey := keys[0].Public()
+
+	claims := &value_objects.Claims{}
+	err = token.Claims(publicKey, claims)
+	if err != nil {
+		return nil, err
+	}
+
+	return claims, nil
 }
 
 func (uc *AuthUseCase) Login(ctx context.Context, email string, password string) (*value_objects.Session, error) {

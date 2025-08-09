@@ -30,7 +30,7 @@ func main() {
 	srv.Use(extension.Introspection{})
 
 	mux := http.NewServeMux()
-	mux.Handle("/graphql", srv)
+	mux.Handle("/graphql", rootContainer.MiddlewareContainer.AuthMiddleware.Authenticate(srv))
 	mux.Handle("/graphiql", playground.Handler("GraphQL playground", "/graphql"))
 
 	addr := "0.0.0.0:" + port

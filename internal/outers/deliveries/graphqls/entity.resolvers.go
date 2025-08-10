@@ -19,7 +19,7 @@ func (r *entityResolver) FindAccountByID(ctx context.Context, id string) (*model
 		return nil, err
 	}
 
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, convertedID)
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, &convertedID)
 	if err != nil {
 		return nil, err
 	}

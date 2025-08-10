@@ -153,7 +153,7 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, id string, input m
 		return nil, err
 	}
 
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, convertedID)
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, &convertedID)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, id string, input m
 	foundAccount.Email = &input.Email
 	foundAccount.Password = &input.Password
 	foundAccount.Scopes = input.Scopes
-	updatedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.UpdateAccountByID(ctx, convertedID, foundAccount)
+	updatedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.UpdateAccountByID(ctx, &convertedID, foundAccount)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func (r *mutationResolver) UpdateMyAccount(ctx context.Context, input model.Acco
 		return nil, err
 	}
 
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, convertedID)
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, &convertedID)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +212,7 @@ func (r *mutationResolver) UpdateMyAccount(ctx context.Context, input model.Acco
 	foundAccount.Email = &input.Email
 	foundAccount.Password = &input.Password
 	foundAccount.Scopes = input.Scopes
-	updatedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.UpdateAccountByID(ctx, convertedID, foundAccount)
+	updatedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.UpdateAccountByID(ctx, &convertedID, foundAccount)
 	if err != nil {
 		return nil, err
 	}
@@ -248,7 +248,7 @@ func (r *mutationResolver) DeleteAccount(ctx context.Context, id string) (*model
 		return nil, err
 	}
 
-	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, convertedID)
+	foundAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.GetAccountByID(ctx, &convertedID)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +257,7 @@ func (r *mutationResolver) DeleteAccount(ctx context.Context, id string) (*model
 		return nil, fmt.Errorf("account not found")
 	}
 
-	deletedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.DeleteAccountByID(ctx, convertedID)
+	deletedAccount, err := r.RootContainer.UseCaseContainer.AccountUseCase.DeleteAccountByID(ctx, &convertedID)
 	if err != nil {
 		return nil, err
 	}

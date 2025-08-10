@@ -8,11 +8,8 @@ import (
 	"strings"
 )
 
-var ClaimCtxKey = &contextKey{"claimContextKey"}
-
-type contextKey struct {
-	name string
-}
+var HeaderCtxKey = "headerContextKey"
+var ClaimCtxKey = "claimContextKey"
 
 type AuthMiddleware struct {
 	AuthUseCase *use_cases.AuthUseCase
@@ -41,9 +38,15 @@ func (m *AuthMiddleware) Authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), ClaimCtxKey, claims)
+		ctx := context.WithValue(r.Context(), HeaderCtxKey, r.Header)
+		ctx = context.WithValue(r.Context(), ClaimCtxKey, claims)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func GetHeaderContext(ctx context.Context) http.Header {
+	raw, _ := ctx.Value(ClaimCtxKey).(http.Header)
+	return raw
 }
 
 func GetClaimContext(ctx context.Context) *value_objects.Claims {

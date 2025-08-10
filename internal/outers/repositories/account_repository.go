@@ -54,7 +54,7 @@ func (r *AccountRepository) GetAllAccounts(ctx context.Context) ([]*entities.Acc
 	return accounts, nil
 }
 
-func (r *AccountRepository) GetAccountByID(ctx context.Context, id uuid.UUID) (*entities.Account, error) {
+func (r *AccountRepository) GetAccountByID(ctx context.Context, id *uuid.UUID) (*entities.Account, error) {
 	query := `
 		SELECT json_build_object(
 			'id', id,
@@ -203,7 +203,7 @@ func (r *AccountRepository) CreateAccount(ctx context.Context, account *entities
 		return nil, fmt.Errorf("database insert two failed: %w", err)
 	}
 
-	createdAccount, err := r.GetAccountByID(ctx, *account.ID)
+	createdAccount, err := r.GetAccountByID(ctx, account.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve created account: %w", err)
 	}
@@ -211,7 +211,7 @@ func (r *AccountRepository) CreateAccount(ctx context.Context, account *entities
 	return createdAccount, nil
 }
 
-func (r *AccountRepository) UpdateAccountByID(ctx context.Context, id uuid.UUID, account *entities.Account) (*entities.Account, error) {
+func (r *AccountRepository) UpdateAccountByID(ctx context.Context, id *uuid.UUID, account *entities.Account) (*entities.Account, error) {
 	query_one := `
 		UPDATE account
 		SET image_id = $1, name = $2, email = $3, password = $4, total_post_like = $5, total_chat_message = $6
@@ -266,7 +266,7 @@ func (r *AccountRepository) UpdateAccountByID(ctx context.Context, id uuid.UUID,
 	return updatedAccount, nil
 }
 
-func (r *AccountRepository) DeleteAccountByID(ctx context.Context, id uuid.UUID) (*entities.Account, error) {
+func (r *AccountRepository) DeleteAccountByID(ctx context.Context, id *uuid.UUID) (*entities.Account, error) {
 	foundAccount, err := r.GetAccountByID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve account for deletion: %w", err)
@@ -285,7 +285,7 @@ func (r *AccountRepository) DeleteAccountByID(ctx context.Context, id uuid.UUID)
 	return foundAccount, nil
 }
 
-func (r *AccountRepository) IncrementTotalPostLike(ctx context.Context, accountID uuid.UUID, delta float64) error {
+func (r *AccountRepository) IncrementTotalPostLike(ctx context.Context, accountID *uuid.UUID, delta float64) error {
 	query := `
 		UPDATE account
 		SET total_post_like = COALESCE(total_post_like, 0) + $1
@@ -298,7 +298,7 @@ func (r *AccountRepository) IncrementTotalPostLike(ctx context.Context, accountI
 	return nil
 }
 
-func (r *AccountRepository) DecrementTotalPostLike(ctx context.Context, accountID uuid.UUID, delta float64) error {
+func (r *AccountRepository) DecrementTotalPostLike(ctx context.Context, accountID *uuid.UUID, delta float64) error {
 	query := `
 		UPDATE account
 		SET total_post_like = COALESCE(total_post_like, 0) - $1
@@ -311,7 +311,7 @@ func (r *AccountRepository) DecrementTotalPostLike(ctx context.Context, accountI
 	return nil
 }
 
-func (r *AccountRepository) IncrementTotalChatMessage(ctx context.Context, accountID uuid.UUID, delta float64) error {
+func (r *AccountRepository) IncrementTotalChatMessage(ctx context.Context, accountID *uuid.UUID, delta float64) error {
 	query := `
 		UPDATE account
 		SET total_chat_message = COALESCE(total_chat_message, 0) + $1

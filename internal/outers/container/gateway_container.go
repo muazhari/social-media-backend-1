@@ -6,10 +6,12 @@ import (
 
 type GatewayContainer struct {
 	AuthGateway *gateways.AuthGateway
+	EDFGateway  *gateways.EDFGateway
 }
 
-func NewGatewayContainer(configContainer *ConfigContainer) *GatewayContainer {
+func NewGatewayContainer(configContainer *ConfigContainer, repositoryContainer *RepositoryContainer) *GatewayContainer {
 	return &GatewayContainer{
 		AuthGateway: gateways.NewAuthGateway(configContainer.AuthConfig),
+		EDFGateway:  gateways.NewEDFGateway(repositoryContainer.AccountRepository),
 	}
 }

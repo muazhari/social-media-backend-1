@@ -54,7 +54,7 @@ func (uc *AccountUseCase) GetAccountsByIDs(ctx context.Context, ids []*uuid.UUID
 	return foundAccounts, nil
 }
 
-func (uc *AccountUseCase) GetAccountByID(ctx context.Context, id uuid.UUID) (*entities.Account, error) {
+func (uc *AccountUseCase) GetAccountByID(ctx context.Context, id *uuid.UUID) (*entities.Account, error) {
 	foundAccount, err := uc.AccountRepository.GetAccountByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func (uc *AccountUseCase) CreateAccount(ctx context.Context, accountToCreate *en
 	return createdAccount, nil
 }
 
-func (uc *AccountUseCase) UpdateAccountByID(ctx context.Context, id uuid.UUID, accountToUpdate *entities.Account) (*entities.Account, error) {
+func (uc *AccountUseCase) UpdateAccountByID(ctx context.Context, id *uuid.UUID, accountToUpdate *entities.Account) (*entities.Account, error) {
 	foundAccount, err := uc.AccountRepository.GetAccountByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func (uc *AccountUseCase) UpdateAccountByID(ctx context.Context, id uuid.UUID, a
 	return updatedAccount, nil
 }
 
-func (uc *AccountUseCase) DeleteAccountByID(ctx context.Context, id uuid.UUID) (*entities.Account, error) {
+func (uc *AccountUseCase) DeleteAccountByID(ctx context.Context, id *uuid.UUID) (*entities.Account, error) {
 	deletedAccount, err := uc.AccountRepository.DeleteAccountByID(ctx, id)
 	if err != nil {
 		return nil, err

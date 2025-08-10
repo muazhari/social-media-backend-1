@@ -11,9 +11,9 @@ type RootContainer struct {
 func NewRootContainer() *RootContainer {
 	configContainer := NewConfigContainer()
 	repositoryContainer := NewRepositoryContainer(configContainer)
-	gatewayContainer := NewGatewayContainer(configContainer)
+	gatewayContainer := NewGatewayContainer(configContainer, repositoryContainer)
 	useCaseContainer := NewUseCaseContainer(repositoryContainer, gatewayContainer)
-	middlewareContainer := NewMiddlewareContainer(configContainer, useCaseContainer, repositoryContainer)
+	middlewareContainer := NewMiddlewareContainer(useCaseContainer, repositoryContainer)
 
 	return &RootContainer{
 		ConfigContainer:     configContainer,

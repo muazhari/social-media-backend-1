@@ -5,21 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71953d37-8715-42c5-b1f9-b5bb73b7f1dd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/internal/outers/deliveries/gateways/edf_gateway.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.example.env" beforeDir="false" afterPath="$PROJECT_DIR$/.example.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilotDiffState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/copilotDiffState.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/inners/use_cases/account_use_case.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/inners/use_cases/account_use_case.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/container/config_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/config_container.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/container/gateway_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/gateway_container.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/container/middleware_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/middleware_container.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/container/root_container.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/container/root_container.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/entity.resolvers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/entity.resolvers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/federation.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/federation.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/generated.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/generated.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/model/models_gen.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/model/models_gen.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.resolvers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/graphqls/schema.resolvers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/middlewares/auth_middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/deliveries/middlewares/auth_middleware.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/deliveries/middlewares/kafka_consumer.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/outers/repositories/account_repository.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +30,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../Program Files/Go" />
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -43,15 +40,15 @@
     &quot;assignee&quot;: &quot;muazhari&quot;
   }
 }</component>
-  <component name="GithubDefaultAccount">
-    <option name="defaultAccountId" value="28a0e9ac-6af1-4689-86fe-0ba5520ac6f4" />
-  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/muazhari/social-media-backend-1.git&quot;,
     &quot;accountId&quot;: &quot;28a0e9ac-6af1-4689-86fe-0ba5520ac6f4&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../../../Program Files/Go/src/runtime/panic.go" root0="SKIP_INSPECTION" />
+  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="ProjectErrors" />
   </component>
@@ -81,7 +78,7 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
     &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/data/apps/social-media/social-media-backend-1/internal/outers/deliveries/gateways&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/data/apps/social-media-backend-1&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
@@ -98,11 +95,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\data\apps\social-media-backend-1" />
       <recent name="C:\data\apps\social-media\social-media-backend-1\internal\outers\deliveries\gateways" />
       <recent name="C:\data\apps\social-media-backend-1\internal\outers\configs" />
       <recent name="C:\data\apps\social-media-backend-1\internal\outers\container" />
       <recent name="C:\data\apps\social-media-backend-1\internal\inners\models\entities" />
-      <recent name="C:\data\apps\social-media-backend-1\internal\outers\deliveries\graphqls" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\data\apps\social-media-backend-1\internal" />
@@ -162,8 +159,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-gosdk-f466f9b0953e-3d2cccfc42a2-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-252.23892.449" />
-        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-GO-252.23892.449" />
+        <option value="bundled-gosdk-f466f9b0953e-146d08934cbf-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-252.27397.100" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-GO-252.27397.100" />
       </set>
     </attachedChunks>
   </component>

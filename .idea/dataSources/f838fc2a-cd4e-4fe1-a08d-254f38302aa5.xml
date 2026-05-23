@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="social-media-datastore-2@localhost">
-  <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.53">
+  <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.55">
     <root id="1">
       <DateStyle>mdy</DateStyle>
       <Grants>1||-9223372036854775808|c|G
@@ -7071,7 +7071,6 @@ unpackaged</AvailableUpdates>
 13542||10|t|G
 13542||10|D|G
 13542||10|w|G</Grants>
-      <IntrospectionStateNumber>787</IntrospectionStateNumber>
       <LastIntrospectionLocalTimestamp>2025-07-06.11:58:36</LastIntrospectionLocalTimestamp>
       <ObjectId>13196</ObjectId>
       <StateNumber>538</StateNumber>
@@ -8279,7 +8278,6 @@ unpackaged</AvailableUpdates>
 12347||10|t|G
 12347||10|D|G
 12347||10|w|G</Grants>
-      <IntrospectionStateNumber>787</IntrospectionStateNumber>
       <LastIntrospectionLocalTimestamp>2025-07-06.11:58:36</LastIntrospectionLocalTimestamp>
       <ObjectId>11</ObjectId>
       <StateNumber>532</StateNumber>
@@ -8312,7 +8310,6 @@ unpackaged</AvailableUpdates>
 18927||10|t|G
 18927||10|D|G
 18927||10|w|G</Grants>
-      <IntrospectionStateNumber>787</IntrospectionStateNumber>
       <LastIntrospectionLocalTimestamp>2025-07-06.11:58:36</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>532</StateNumber>
@@ -8383,14 +8380,12 @@ unpackaged</AvailableUpdates>
 19673||10|t|G
 19673||10|D|G
 19673||10|w|G</Grants>
-      <IntrospectionStateNumber>787</IntrospectionStateNumber>
       <LastIntrospectionLocalTimestamp>2025-07-06.11:58:36</LastIntrospectionLocalTimestamp>
       <ObjectId>19314</ObjectId>
       <StateNumber>749</StateNumber>
       <OwnerName>user</OwnerName>
     </schema>
     <schema id="301" parent="2" name="tiger_data">
-      <IntrospectionStateNumber>787</IntrospectionStateNumber>
       <LastIntrospectionLocalTimestamp>2025-07-06.11:58:36</LastIntrospectionLocalTimestamp>
       <ObjectId>19570</ObjectId>
       <StateNumber>749</StateNumber>
@@ -8418,7 +8413,6 @@ unpackaged</AvailableUpdates>
 19147||10|t|G
 19147||10|D|G
 19147||10|w|G</Grants>
-      <IntrospectionStateNumber>787</IntrospectionStateNumber>
       <LastIntrospectionLocalTimestamp>2025-07-06.11:58:36</LastIntrospectionLocalTimestamp>
       <ObjectId>19132</ObjectId>
       <StateNumber>747</StateNumber>

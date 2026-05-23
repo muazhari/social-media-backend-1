@@ -3,34 +3,61 @@ package use_cases
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"math/rand"
 	"social-media-backend-1/internal/inners/models/entities"
 	"social-media-backend-1/internal/outers/repositories"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type AccountUseCase struct {
 	AccountRepository *repositories.AccountRepository
 	FileRepository    *repositories.FileRepository
+	Tracer            trace.Tracer
 }
 
 func NewAccountUseCase(accountRepository *repositories.AccountRepository, fileRepository *repositories.FileRepository) *AccountUseCase {
 	return &AccountUseCase{
 		AccountRepository: accountRepository,
 		FileRepository:    fileRepository,
+		Tracer:            otel.Tracer("account-use-case"),
 	}
 }
 
 func (uc *AccountUseCase) GetAllAccounts(ctx context.Context) ([]*entities.Account, error) {
+	ctx, span := uc.Tracer.Start(ctx, "GetAllAccounts")
+	defer span.End()
+
+	slog.InfoContext(ctx, "Fetching all accounts", slog.String("operation", "GetAllAccounts"))
+
+	// PROBLEM SIMULATION:
+	// Simulate an intermittent database locking issue or heavy CPU load
+	if rand.Intn(100) < 50 { // 50% chance to simulate a massive slowdown
+		slog.WarnContext(ctx, "Simulated artificial slowdown due to DB locks!", slog.String("reason", "db_lock_simulation"))
+		span.SetAttributes(attribute.Bool("error.simulated_slowdown", true))
+		time.Sleep(3 * time.Second) // Simulated high latency
+
+		// Simulate memory spike or large iteration
+		_ = make([]byte, 100*1024*1024) // 100MB alloc
+		span.AddEvent("Allocated 100MB array for simulation")
+	}
+
 	foundAccounts, err := uc.AccountRepository.GetAllAccounts(ctx)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
 	for _, foundAccount := range foundAccounts {
 		foundAccount.ImageURL, err = uc.GetAccountImageURL(ctx, foundAccount)
 		if err != nil {
+			span.RecordError(err)
 			return nil, err
 		}
 	}
